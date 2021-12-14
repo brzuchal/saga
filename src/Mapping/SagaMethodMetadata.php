@@ -1,14 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
 
 final class SagaMethodMetadata
 {
-    /**
-     * @param list<class-string> $parameterTypes
-     */
     public function __construct(
         protected string $name,
         /** @psalm-var list<class-string> */

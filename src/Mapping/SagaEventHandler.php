@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Attribute;
+namespace Brzuchal\Saga\Mapping;
 
 use Attribute;
 

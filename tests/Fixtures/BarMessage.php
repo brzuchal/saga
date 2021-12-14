@@ -2,15 +2,10 @@
 
 namespace Brzuchal\Saga\Tests\Fixtures;
 
-class FooMessage
+class BarMessage
 {
     public function __construct(
-        public int $id = 123,
+        public readonly string $bar = 'bar',
     ) {
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 }

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Tests;
+namespace Brzuchal\Saga\Tests\Mapping;
 
-use Brzuchal\Saga\AttributeSagaMetadataFactory;
+use Brzuchal\Saga\Mapping\AttributeSagaMetadataFactory;
 use Brzuchal\Saga\Tests\Fixtures\AttributedFoo;
 use Brzuchal\Saga\Tests\Fixtures\FooMessage;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +15,12 @@ class AttributeSagaMetadataFactoryTest extends TestCase
         $metadata = $factory->create(AttributedFoo::class);
         $this->assertEquals(AttributedFoo::class, $metadata->getName());
         $message = new FooMessage();
+        $this->assertEquals(AttributedFoo::class, $metadata->getName());
         $this->assertTrue($metadata->hasHandlerMethod($message));
+        $this->assertEquals('foo', $metadata->findHandlerMethod($message));
+        $associationValue = $metadata->resolveAssociation($message);
+        $this->assertNotNull($associationValue);
+        $this->assertEquals('keyInt', $associationValue->getKey());
+        $this->assertEquals(123, $associationValue->getValue());
     }
 }

@@ -4,6 +4,8 @@ namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Exception\SagaInstanceNotFound;
+use Brzuchal\Saga\Mapping\SagaMetadataRepository;
+use Brzuchal\Saga\Store\SagaStore;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

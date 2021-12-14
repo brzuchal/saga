@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
 
@@ -27,13 +27,13 @@ interface SagaStore
 
     /**
      * @param class-string $type
-     * @psalm-param list<AssociationValue>
+     * @psalm-param AssociationValue
      */
     public function insertSaga(string $type, string $identifier, object $saga, iterable $associationValues): void;
 
     /**
      * @param class-string $type
-     * @psalm-param list<AssociationValue>
+     * @psalm-param AssociationValue
      */
     public function updateSaga(string $type, string $identifier, object $saga, iterable $associationValues): void;
 }

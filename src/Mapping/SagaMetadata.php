@@ -1,15 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Closure;
 
 final class SagaMetadata
 {
-    /**
-     * @psalm-param list<SagaMethodMetadata> $methods
-     */
     public function __construct(
         /** @psalm-var class-string */
         protected string $type,
@@ -24,8 +21,6 @@ final class SagaMetadata
      */
     public function getName(): string
     {
-        \assert(\class_exists($this->type));
-
         return $this->type;
     }
 

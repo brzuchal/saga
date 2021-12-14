@@ -3,7 +3,6 @@
 namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use Brzuchal\Saga\SagaStore;
 
 final class InMemorySagaStore implements SagaStore
 {
