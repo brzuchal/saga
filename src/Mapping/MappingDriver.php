@@ -2,10 +2,10 @@
 
 namespace Brzuchal\Saga\Mapping;
 
-interface SagaMetadataFactory
+interface MappingDriver
 {
     /**
      * @psalm-param class-string $class
      */
-    public function create(string $class): SagaMetadata;
+    public function loadMetadataForClass(string $class): SagaMetadata;
 }

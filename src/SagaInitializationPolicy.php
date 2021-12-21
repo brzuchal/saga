@@ -18,7 +18,7 @@ class SagaInitializationPolicy
     /**
      * Creates an instance using the given {@see self::creationPolicy()} and {@see self::initialAssociationValue()}.
      *
-     * @param SagaCreationPolicy $creationPolicy             The policy describing the condition to create a new instance
+     * @param SagaCreationPolicy $creationPolicy             The policy describing the condition to loadMetadataForClass a new instance
      * @param AssociationValue $initialAssociationValue The association value a new Saga instance should be given
      */
     public function __construct(

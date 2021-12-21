@@ -2,7 +2,7 @@
 
 namespace Brzuchal\Saga\Tests\Mapping;
 
-use Brzuchal\Saga\Mapping\AttributeSagaMetadataFactory;
+use Brzuchal\Saga\Mapping\AttributeMappingDriver;
 use Brzuchal\Saga\Tests\Fixtures\AttributedFoo;
 use Brzuchal\Saga\Tests\Fixtures\FooMessage;
 use PHPUnit\Framework\TestCase;
@@ -11,8 +11,8 @@ class AttributeSagaMetadataFactoryTest extends TestCase
 {
     public function testSingleMethodFactory(): void
     {
-        $factory = new AttributeSagaMetadataFactory();
-        $metadata = $factory->create(AttributedFoo::class);
+        $factory = new AttributeMappingDriver();
+        $metadata = $factory->loadMetadataForClass(AttributedFoo::class);
         $this->assertEquals(AttributedFoo::class, $metadata->getName());
         $message = new FooMessage();
         $this->assertEquals(AttributedFoo::class, $metadata->getName());

@@ -13,12 +13,12 @@ use Roave\BetterReflection\Reflection\ReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionNamedType;
 use UnexpectedValueException;
 
-class AttributeSagaMetadataFactory implements SagaMetadataFactory
+class AttributeMappingDriver implements MappingDriver
 {
     private const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^ CoreReflectionMethod::IS_ABSTRACT ^ CoreReflectionMethod::IS_STATIC;
 
     /** @inheritdoc */
-    public function create(string $class): SagaMetadata
+    public function loadMetadataForClass(string $class): SagaMetadata
     {
         // TODO: rework
         $reflection = ReflectionClass::createFromName($class);

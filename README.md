@@ -32,14 +32,14 @@ class OrderProcessing
 ```php
 use App\OrderProcessing;
 use App\Events\OrderCreated;
-use Brzuchal\Saga\Mapping\AttributeSagaMetadataFactory;
+use Brzuchal\Saga\Mapping\AttributeMappingDriver;
 use Brzuchal\Saga\Mapping\SagaMetadataRepository;
 use Brzuchal\Saga\SagaManager;
 use Brzuchal\Saga\Store\InMemorySagaStore;
 
-$metadataFactory = new AttributeSagaMetadataFactory();
+$metadataFactory = new AttributeMappingDriver();
 $metadataRepository = new SagaMetadataRepository([
-    $metadataFactory->create(OrderProcessing::class);
+    $metadataFactory->loadMetadataForClass(OrderProcessing::class);
 ]);
 $store = new InMemorySagaStore();
 $manager = new SagaManager($store, $metadataRepository)
