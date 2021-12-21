@@ -9,5 +9,5 @@ interface AssociationEvaluator
     /**
      * @psalm-param class-string $type
      */
-    public function supports(string $type, string $associationKey): bool;
+    public function supports(string $type, string $key): bool;
 }

@@ -27,7 +27,7 @@ final class MethodNameEvaluator implements AssociationEvaluator
     /**
      * @psalm-param class-string $type
      */
-    public function supports(string $type, string $associationKey): bool
+    public function supports(string $type, string $key): bool
     {
         return \method_exists($type, $this->methodName);
     }

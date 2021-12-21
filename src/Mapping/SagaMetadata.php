@@ -57,7 +57,8 @@ final class SagaMetadata
     protected function findForArgumentType(string $class): ?SagaMethodMetadata
     {
         foreach ($this->methods as $method) {
-            if (!\in_array($class, $method->getParameterTypes(), true)) {
+            \assert($method instanceof SagaMethodMetadata);
+            if (!\in_array($class, $method->getTypes(), true)) {
                 continue;
             }
 

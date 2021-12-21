@@ -5,15 +5,15 @@ namespace Brzuchal\Saga\Mapping;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class SagaEventHandler
+class SagaMessageHandler
 {
-    public string $associationKey;
+    public string $key;
 
     /**
      * @psalm-param array|null $expressionParameters
      */
     public function __construct(
-        string|null $associationKey = null,
+        string|null $key = null,
         public string|null $property = null,
         public string|null $method = null,
         public string|null $expression = null,
@@ -22,12 +22,12 @@ class SagaEventHandler
         /** @psalm-var class-string|null */
         public string|null $evaluator = null,
     ) {
-        if ($this->property === null && $associationKey === null) {
+        if ($this->property === null && $key === null) {
             throw new \RuntimeException(
                 'Association key has to be passed if no association property given'
             );
         }
 
-        $this->associationKey = $associationKey ?? $this->property;
+        $this->key = $key ?? $this->property;
     }
 }

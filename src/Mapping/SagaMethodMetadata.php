@@ -3,13 +3,15 @@
 namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
+use function class_implements;
+use function class_parents;
 
 final class SagaMethodMetadata
 {
     public function __construct(
         protected string $name,
         /** @psalm-var list<class-string> */
-        protected array $parameterTypes,
+        protected array $types,
         protected AssociationResolver $associationResolver,
     ) {
     }
@@ -19,32 +21,24 @@ final class SagaMethodMetadata
         return $this->name;
     }
 
-    /**
-     * @psalm-return list<class-string>
-     */
-    public function getParameterTypes(): array
-    {
-        return self::listTypes($this->parameterTypes);
-    }
-
     public function getAssociationResolver(): AssociationResolver
     {
         return $this->associationResolver;
     }
 
     /**
-     * @psalm-param list<class-string>
      * @psalm-return list<class-string>
      */
-    public static function listTypes(array $classes): array
+    public function getTypes(): array
     {
         $types = [];
-        foreach ($classes as $class) {
+        foreach ($this->types as $class) {
             $types += [$class => $class]
-                + \class_parents($class)
-                + \class_implements($class);
+                + class_parents($class)
+                + class_implements($class);
         }
 
         return $types;
     }
+
 }

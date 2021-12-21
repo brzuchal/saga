@@ -38,7 +38,7 @@ class AttributeSagaMetadataFactory implements SagaMetadataFactory
     {
         $methods = [];
         foreach ($class->getMethods(self::METHODS_FILTER) as $method) {
-            $eventHandlerAttribute = $this->extractEventHandlerAttribute($method);
+            $eventHandlerAttribute = $this->extractMessageHandlerAttribute($method);
             if ($eventHandlerAttribute === null) {
                 continue;
             }
@@ -62,9 +62,9 @@ class AttributeSagaMetadataFactory implements SagaMetadataFactory
             \assert($eventHandlerAttribute->property !== null);
             $methods[] = new SagaMethodMetadata(
                 name: $method->getName(),
-                parameterTypes: $parameterTypes,
+                types: $parameterTypes,
                 associationResolver: new AssociationResolver(
-                    $eventHandlerAttribute->associationKey,
+                    $eventHandlerAttribute->key,
                     new PropertyNameEvaluator($eventHandlerAttribute->property),
                 ),
             );
@@ -86,15 +86,15 @@ class AttributeSagaMetadataFactory implements SagaMetadataFactory
         return $instance;
     }
 
-    private function extractEventHandlerAttribute(ReflectionMethod $method): SagaEventHandler|null
+    private function extractMessageHandlerAttribute(ReflectionMethod $method): SagaMessageHandler|null
     {
-        $attributes = $method->getAttributesByName(SagaEventHandler::class);
+        $attributes = $method->getAttributesByName(SagaMessageHandler::class);
         if (empty($attributes)) {
             return null;
         }
 
         $instance = new ($attributes[0]->getName())(...$attributes[0]->getArguments());
-        \assert($instance instanceof SagaEventHandler);
+        \assert($instance instanceof SagaMessageHandler);
 
         return $instance;
     }
