@@ -3,6 +3,7 @@
 namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\Exception\IncompleteMetadata;
 use Closure;
 
 final class SagaMetadata
@@ -29,18 +30,29 @@ final class SagaMetadata
         return ($this->factory)();
     }
 
-    public function resolveAssociation(object $message): ?AssociationValue
+    /**
+     * @throws IncompleteMetadata
+     */
+    public function resolveAssociation(object $message): AssociationValue
     {
-        return $this->findForArgumentType(\get_class($message))
-            ?->getAssociationResolver()
-            ->resolve($message);
+        $class = \get_class($message);
+        $methodMetadata = $this->findForArgumentType($class);
+        if ($methodMetadata === null) {
+            throw IncompleteMetadata::unsupportedMessageType($this->getName(), $class);
+        }
+
+        return $methodMetadata->getAssociationResolver()->resolve($message);
     }
 
+    /**
+     * @throws IncompleteMetadata
+     */
     public function findHandlerMethod(object $message): string
     {
-        $methodMetadata = $this->findForArgumentType(\get_class($message));
+        $class = \get_class($message);
+        $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
-            throw new \UnexpectedValueException('Handler method not found');
+            throw IncompleteMetadata::unsupportedMessageType($this->getName(), $class);
         }
 
         return $methodMetadata->getName();
@@ -54,10 +66,9 @@ final class SagaMetadata
     /**
      * @psalm-param class-string $class
      */
-    protected function findForArgumentType(string $class): ?SagaMethodMetadata
+    protected function findForArgumentType(string $class): SagaMethodMetadata|null
     {
         foreach ($this->methods as $method) {
-            \assert($method instanceof SagaMethodMetadata);
             if (!\in_array($class, $method->getTypes(), true)) {
                 continue;
             }

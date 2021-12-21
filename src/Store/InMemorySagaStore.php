@@ -31,7 +31,7 @@ final class InMemorySagaStore implements SagaStore
     }
 
     /** @inheritdoc */
-    public function loadSaga(string $type, string $identifier): ?object
+    public function loadSaga(string $type, string $identifier): object|null
     {
         if (!\array_key_exists($type, $this->instances)) {
             return null;

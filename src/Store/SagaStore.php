@@ -18,7 +18,7 @@ interface SagaStore
     /**
      * @param class-string $type
      */
-    public function loadSaga(string $type, string $identifier): ?object;
+    public function loadSaga(string $type, string $identifier): object|null;
 
     /**
      * @param class-string $type

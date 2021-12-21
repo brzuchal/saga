@@ -9,9 +9,9 @@ final class Saga
 {
     public function __construct(
         /** @psalm-param null|class-string */
-        public ?string $store = null,
+        public string|null $store = null,
         /** @psalm-param null|class-string */
-        public ?string $factory = null,
+        public string|null $factory = null,
     ) {
     }
 }

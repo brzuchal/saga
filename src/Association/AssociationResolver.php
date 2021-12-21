@@ -10,7 +10,7 @@ final class AssociationResolver
     ) {
     }
 
-    public function resolve(object $message): ?AssociationValue
+    public function resolve(object $message): AssociationValue|null
     {
         if (!$this->associationEvaluator->supports(\get_class($message), $this->key)) {
             throw new \UnexpectedValueException(\sprintf(
