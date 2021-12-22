@@ -5,18 +5,18 @@ namespace Brzuchal\Saga\Exception;
 use Brzuchal\Saga\Association\AssociationValue;
 use DomainException;
 
-final class SagaInstanceNotFound extends DomainException
+final class InstanceNotFound extends DomainException
 {
     /**
      * @param class-string $type
      */
-    public function __construct(string $type, AssociationValue $associationValue)
+    public static function unableToLoad(string $type, AssociationValue $associationValue): self
     {
-        $this->message = \sprintf(
+        return new self(\sprintf(
             'Instance of %s Saga not found using association %s=%s',
             $type,
             $associationValue->getKey(),
             (string) $associationValue->getValue(),
-        );
+        ));
     }
 }

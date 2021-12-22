@@ -4,7 +4,7 @@ namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Exception\IncompleteMetadata;
-use Brzuchal\Saga\Exception\SagaInstanceNotFound;
+use Brzuchal\Saga\Exception\InstanceNotFound;
 use Brzuchal\Saga\Mapping\SagaMetadataRepository;
 use Brzuchal\Saga\Store\SagaStore;
 use Exception;
@@ -31,7 +31,7 @@ final class SagaManager
                 // at this point we also need to filter closed instances
                 $saga = $this->store->loadSaga($type, $identifier);
                 if ($saga === null) {
-                    throw new SagaInstanceNotFound($type, $associationValue);
+                    throw InstanceNotFound::unableToLoad($type, $associationValue);
                 }
 
                 $this->doInvokeSaga($saga, $message, $associationValue);

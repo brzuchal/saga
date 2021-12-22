@@ -47,21 +47,18 @@ final class InMemorySagaStore implements SagaStore
     /** @inheritdoc */
     public function deleteSaga(string $type, string $identifier): void
     {
-        \assert(\class_exists($type));
         unset($this->instances[$type][$identifier]);
     }
 
     /** @inheritdoc */
     public function insertSaga(string $type, string $identifier, object $saga, iterable $associationValues): void
     {
-        \assert(\class_exists($type));
         $this->instances[$type][$identifier] = new InMemorySagaEntry($saga, $associationValues);
     }
 
     /** @inheritdoc */
     public function updateSaga(string $type, string $identifier, object $saga, iterable $associationValues): void
     {
-        \assert(\class_exists($type));
         $this->instances[$type][$identifier]->saga = $saga;
         $this->instances[$type][$identifier]->associationValues = $associationValues;
     }
@@ -72,7 +69,7 @@ final class InMemorySagaEntry
 {
     public function __construct(
         public object $saga,
-        /** @psalm-return list<\Brzuchal\Saga\Association\AssociationValue> */
+        /** @psalm-return list<AssociationValue> */
         public iterable $associationValues,
     ) {
     }

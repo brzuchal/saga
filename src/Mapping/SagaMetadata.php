@@ -41,7 +41,12 @@ final class SagaMetadata
             throw IncompleteMetadata::unsupportedMessageType($this->getName(), $class);
         }
 
-        return $methodMetadata->getAssociationResolver()->resolve($message);
+        $associationValue = $methodMetadata->getAssociationResolver()->resolve($message);
+        if ($associationValue === null) {
+            throw IncompleteMetadata::missingAssociationResolver($this->getName(), $class);
+        }
+
+        return $associationValue;
     }
 
     /**

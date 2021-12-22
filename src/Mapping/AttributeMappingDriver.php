@@ -80,7 +80,9 @@ class AttributeMappingDriver implements MappingDriver
             return null;
         }
 
-        $instance = new ($attributes[0]->getName())(...$attributes[0]->getArguments());
+        $className = $attributes[0]->getName();
+        \assert(\class_exists($className));
+        $instance = new ($className)(...$attributes[0]->getArguments());
         \assert($instance instanceof SagaStart);
 
         return $instance;
@@ -93,7 +95,9 @@ class AttributeMappingDriver implements MappingDriver
             return null;
         }
 
-        $instance = new ($attributes[0]->getName())(...$attributes[0]->getArguments());
+        $className = $attributes[0]->getName();
+        \assert(\class_exists($className));
+        $instance = new ($className)(...$attributes[0]->getArguments());
         \assert($instance instanceof SagaMessageHandler);
 
         return $instance;

@@ -3,8 +3,6 @@
 namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
-use function class_implements;
-use function class_parents;
 
 final class SagaMethodMetadata
 {
@@ -31,14 +29,7 @@ final class SagaMethodMetadata
      */
     public function getTypes(): array
     {
-        $types = [];
-        foreach ($this->types as $class) {
-            $types += [$class => $class]
-                + class_parents($class)
-                + class_implements($class);
-        }
-
-        return $types;
+        return $this->types;
     }
 
 }
