@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Mapping;
 
 enum SagaMethodType: string
 {

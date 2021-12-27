@@ -1,13 +1,13 @@
 <?php
 
-namespace Brzuchal\Saga\Tests;
+namespace Brzuchal\Saga\Tests\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
 use Brzuchal\Saga\Association\MethodNameEvaluator;
 use Brzuchal\Saga\Association\PropertyNameEvaluator;
 use Brzuchal\Saga\Factory\ReflectionClassFactory;
-use Brzuchal\Saga\SagaMetadata;
-use Brzuchal\Saga\SagaMethodMetadata;
+use Brzuchal\Saga\Mapping\SagaMetadata;
+use Brzuchal\Saga\Mapping\SagaMethodMetadata;
 use Brzuchal\Saga\Tests\Fixtures\Foo;
 use Brzuchal\Saga\Tests\Fixtures\FooBarMessage;
 use Brzuchal\Saga\Tests\Fixtures\FooMessage;

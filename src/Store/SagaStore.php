@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
 
@@ -10,30 +10,30 @@ use Brzuchal\Saga\Association\AssociationValue;
 interface SagaStore
 {
     /**
-     * @param class-string $type
+     * @psalm-param class-string $type
      * @return list<string>
      */
     public function findSagas(string $type, AssociationValue $associationValue): iterable;
 
     /**
-     * @param class-string $type
+     * @psalm-param class-string $type
      */
-    public function loadSaga(string $type, string $identifier): ?object;
+    public function loadSaga(string $type, string $identifier): object|null;
 
     /**
-     * @param class-string $type
+     * @psalm-param class-string $type
      */
     public function deleteSaga(string $type, string $identifier): void;
 
     /**
-     * @param class-string $type
-     * @psalm-param list<AssociationValue>
+     * @psalm-param class-string $type
+     * @psalm-param iterable<AssociationValue> $associationValues
      */
     public function insertSaga(string $type, string $identifier, object $saga, iterable $associationValues): void;
 
     /**
-     * @param class-string $type
-     * @psalm-param list<AssociationValue>
+     * @psalm-param class-string $type
+     * @psalm-param iterable<AssociationValue> $associationValues
      */
     public function updateSaga(string $type, string $identifier, object $saga, iterable $associationValues): void;
 }

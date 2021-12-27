@@ -6,7 +6,7 @@ final class AssociationValue
 {
     public function __construct(
         protected string $key,
-        protected $value,
+        protected mixed $value,
     ) {
     }
 
@@ -15,13 +15,15 @@ final class AssociationValue
         return $this->key;
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
     public function equals(self $other): bool
     {
-        return $this->key === $other->key && $this->value === $other->value;
+        return $this->key === $other->key &&
+            \get_debug_type($this->value) === \get_debug_type($other->value) &&
+            $this->value === $other->value;
     }
 }

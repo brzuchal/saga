@@ -5,14 +5,14 @@ namespace Brzuchal\Saga\Association;
 final class AssociationResolver
 {
     public function __construct(
-        private string $associationKey,
+        private string $key,
         private AssociationEvaluator $associationEvaluator,
     ) {
     }
 
-    public function resolve(object $message): ?AssociationValue
+    public function resolve(object $message): AssociationValue|null
     {
-        if (!$this->associationEvaluator->supports(\get_class($message), $this->associationKey)) {
+        if (!$this->associationEvaluator->supports(\get_class($message), $this->key)) {
             throw new \UnexpectedValueException(\sprintf(
                 'Class %s is not supported by given association evaluator',
                 \get_class($message),
@@ -21,6 +21,6 @@ final class AssociationResolver
 
         $value = $this->associationEvaluator->evaluate($message);
 
-        return new AssociationValue($this->associationKey, $value);
+        return new AssociationValue($this->key, $value);
     }
 }

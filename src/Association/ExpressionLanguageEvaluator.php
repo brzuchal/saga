@@ -28,7 +28,7 @@ final class ExpressionLanguageEvaluator implements AssociationEvaluator
         );
     }
 
-    public function supports(string $type, string $associationKey): bool
+    public function supports(string $type, string $key): bool
     {
         return \class_exists($type);
     }

@@ -23,7 +23,7 @@ class SagaLifecycle
         $this->active = false;
     }
 
-    public function associateValue(string $key, $value): self
+    public function associateValue(string $key, mixed $value): self
     {
         $this->associationValues[] = new AssociationValue($key, $value);
 

@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Exception;
+namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use DomainException;
+use Exception;
 
-final class SagaInstanceNotFound extends DomainException
+final class SagaInstanceNotFound extends Exception
 {
     /**
      * @param class-string $type
      */
-    public function __construct(string $type, AssociationValue $associationValue)
+    public static function unableToLoad(string $type, AssociationValue $associationValue): self
     {
-        $this->message = \sprintf(
+        return new self(\sprintf(
             'Instance of %s Saga not found using association %s=%s',
             $type,
             $associationValue->getKey(),
             (string) $associationValue->getValue(),
-        );
+        ));
     }
 }

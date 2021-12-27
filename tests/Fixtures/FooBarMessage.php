@@ -4,8 +4,10 @@ namespace Brzuchal\Saga\Tests\Fixtures;
 
 class FooBarMessage
 {
+    public int $id = 456;
+
     public function getId(): int
     {
-        return 456;
+        return $this->id;
     }
 }

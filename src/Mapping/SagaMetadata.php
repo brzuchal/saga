@@ -1,15 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Closure;
 
 final class SagaMetadata
 {
-    /**
-     * @psalm-param list<SagaMethodMetadata> $methods
-     */
     public function __construct(
         /** @psalm-var class-string */
         protected string $type,
@@ -24,8 +21,6 @@ final class SagaMetadata
      */
     public function getName(): string
     {
-        \assert(\class_exists($this->type));
-
         return $this->type;
     }
 
@@ -34,18 +29,34 @@ final class SagaMetadata
         return ($this->factory)();
     }
 
-    public function resolveAssociation(object $message): ?AssociationValue
+    /**
+     * @throws IncompleteSagaMetadata
+     */
+    public function resolveAssociation(object $message): AssociationValue
     {
-        return $this->findForArgumentType(\get_class($message))
-            ?->getAssociationResolver()
-            ->resolve($message);
+        $class = \get_class($message);
+        $methodMetadata = $this->findForArgumentType($class);
+        if ($methodMetadata === null) {
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->getName(), $class);
+        }
+
+        $associationValue = $methodMetadata->getAssociationResolver()->resolve($message);
+        if ($associationValue === null) {
+            throw IncompleteSagaMetadata::missingAssociationResolver($this->getName(), $class);
+        }
+
+        return $associationValue;
     }
 
+    /**
+     * @throws IncompleteSagaMetadata
+     */
     public function findHandlerMethod(object $message): string
     {
-        $methodMetadata = $this->findForArgumentType(\get_class($message));
+        $class = \get_class($message);
+        $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
-            throw new \UnexpectedValueException('Handler method not found');
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->getName(), $class);
         }
 
         return $methodMetadata->getName();
@@ -59,10 +70,10 @@ final class SagaMetadata
     /**
      * @psalm-param class-string $class
      */
-    protected function findForArgumentType(string $class): ?SagaMethodMetadata
+    protected function findForArgumentType(string $class): SagaMethodMetadata|null
     {
         foreach ($this->methods as $method) {
-            if (!\in_array($class, $method->getParameterTypes(), true)) {
+            if (!\in_array($class, $method->getTypes(), true)) {
                 continue;
             }
 

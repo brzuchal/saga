@@ -1,11 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga;
+namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
 use Brzuchal\Saga\Association\PropertyNameEvaluator;
-use Brzuchal\Saga\Attribute\SagaEventHandler;
-use Brzuchal\Saga\Attribute\SagaStart;
 use Brzuchal\Saga\Factory\ReflectionClassFactory;
 use Closure;
 use ReflectionMethod as CoreReflectionMethod;
@@ -13,21 +11,18 @@ use Roave\BetterReflection\Reflection\ReflectionClass;
 use Roave\BetterReflection\Reflection\ReflectionIntersectionType;
 use Roave\BetterReflection\Reflection\ReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionNamedType;
-use Roave\BetterReflection\Reflection\ReflectionUnionType;
 use UnexpectedValueException;
 
-class AttributeSagaMetadataFactory implements SagaMetadataFactory
+final class AttributeMappingDriver implements MappingDriver
 {
-    const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^ CoreReflectionMethod::IS_ABSTRACT ^ CoreReflectionMethod::IS_STATIC;
+    private const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^ CoreReflectionMethod::IS_ABSTRACT ^ CoreReflectionMethod::IS_STATIC;
 
     /** @inheritdoc */
-    public function create(string $class): SagaMetadata
+    public function loadMetadataForClass(string $class): SagaMetadata
     {
         // TODO: rework
-        \assert(\class_exists($class));
         $reflection = ReflectionClass::createFromName($class);
         $factory = new ReflectionClassFactory($reflection->getName());
-        \assert(\is_callable($factory));
 
         return new SagaMetadata(
             $class,
@@ -43,7 +38,7 @@ class AttributeSagaMetadataFactory implements SagaMetadataFactory
     {
         $methods = [];
         foreach ($class->getMethods(self::METHODS_FILTER) as $method) {
-            $eventHandlerAttribute = $this->extractEventHandlerAttribute($method);
+            $eventHandlerAttribute = $this->extractMessageHandlerAttribute($method);
             if ($eventHandlerAttribute === null) {
                 continue;
             }
@@ -55,19 +50,22 @@ class AttributeSagaMetadataFactory implements SagaMetadataFactory
                 ));
             }
             $parameterTypes = $this->extractMethodParameterTypes($method);
-            $startAttribute = $this->extractStartAttribute($method);
-            $startMethod = $startAttribute instanceof SagaStart;
-            $forceNew = false;
-            if ($startAttribute) {
-                $forceNew = $startAttribute->forceNew;
-            }
+            // TODO: implement start flag on SagaMethodMetadata
+//            $startAttribute = $this->extractStartAttribute($method);
+//            $startMethod = $startAttribute instanceof SagaStart;
+//            $forceNew = false;
+//            if ($startAttribute) {
+//                $forceNew = $startAttribute->forceNew;
+//            }
 
+            // TODO: replace with use of factory of association value evaluator
+            \assert($eventHandlerAttribute->property !== null);
             $methods[] = new SagaMethodMetadata(
                 name: $method->getName(),
-                parameterTypes: $parameterTypes,
+                types: $parameterTypes,
                 associationResolver: new AssociationResolver(
-                    'id',
-                    new PropertyNameEvaluator('id'),
+                    $eventHandlerAttribute->key,
+                    new PropertyNameEvaluator($eventHandlerAttribute->property),
                 ),
             );
         }
@@ -82,21 +80,25 @@ class AttributeSagaMetadataFactory implements SagaMetadataFactory
             return null;
         }
 
-        $instance = new ($attributes[0]->getName())(...$attributes[0]->getArguments());
+        $className = $attributes[0]->getName();
+        \assert(\class_exists($className));
+        $instance = new ($className)(...$attributes[0]->getArguments());
         \assert($instance instanceof SagaStart);
 
         return $instance;
     }
 
-    private function extractEventHandlerAttribute(ReflectionMethod $method): SagaEventHandler|null
+    private function extractMessageHandlerAttribute(ReflectionMethod $method): SagaMessageHandler|null
     {
-        $attributes = $method->getAttributesByName(SagaEventHandler::class);
+        $attributes = $method->getAttributesByName(SagaMessageHandler::class);
         if (empty($attributes)) {
             return null;
         }
 
-        $instance = new ($attributes[0]->getName())(...$attributes[0]->getArguments());
-        \assert($instance instanceof SagaEventHandler);
+        $className = $attributes[0]->getName();
+        \assert(\class_exists($className));
+        $instance = new ($className)(...$attributes[0]->getArguments());
+        \assert($instance instanceof SagaMessageHandler);
 
         return $instance;
     }

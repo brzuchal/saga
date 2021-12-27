@@ -24,7 +24,7 @@ final class PropertyNameEvaluator implements AssociationEvaluator
         ));
     }
 
-    public function supports(string $type, string $associationKey): bool
+    public function supports(string $type, string $key): bool
     {
         return \property_exists($type, $this->propertyName);
     }
