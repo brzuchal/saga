@@ -3,8 +3,7 @@
 namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use Brzuchal\Saga\Exception\IncompleteMetadata;
-use Brzuchal\Saga\Exception\InstanceNotFound;
+use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadataRepository;
 use Brzuchal\Saga\Store\SagaStore;
 use Exception;
@@ -19,7 +18,8 @@ final class SagaManager
     }
 
     /**
-     * @throws IncompleteMetadata
+     * @throws SagaInstanceNotFound
+     * @throws IncompleteSagaMetadata
      */
     public function __invoke(object $message): void
     {
@@ -31,7 +31,7 @@ final class SagaManager
                 // at this point we also need to filter closed instances
                 $saga = $this->store->loadSaga($type, $identifier);
                 if ($saga === null) {
-                    throw InstanceNotFound::unableToLoad($type, $associationValue);
+                    throw SagaInstanceNotFound::unableToLoad($type, $associationValue);
                 }
 
                 $this->doInvokeSaga($saga, $message, $associationValue);
@@ -48,14 +48,21 @@ final class SagaManager
         }
     }
 
-    protected function doInvokeSaga(object $saga, object $message, AssociationValue $associationValue): void
+    /**
+     * @throws IncompleteSagaMetadata
+     */
+    protected function doInvokeSaga(object $instance, object $message, AssociationValue $associationValue): void
     {
-        // TODO: reimplement
+        $metadata = $this->repository->find(\get_class($instance));
+        $method = $metadata->findHandlerMethod($message);
+        $lifecycle = new SagaLifecycle(true, [$associationValue]);
+        $instance->{$method}($message, $lifecycle);
     }
 
     /**
      * @param class-string $type
-     * @throws Exception
+     * @throws IncompleteSagaMetadata
+     * @throws IdentifierGenerationFailed
      */
     protected function startNewSaga(string $type, object $message, AssociationValue $associationValue): void
     {

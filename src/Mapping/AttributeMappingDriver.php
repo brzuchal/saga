@@ -13,7 +13,7 @@ use Roave\BetterReflection\Reflection\ReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionNamedType;
 use UnexpectedValueException;
 
-class AttributeMappingDriver implements MappingDriver
+final class AttributeMappingDriver implements MappingDriver
 {
     private const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^ CoreReflectionMethod::IS_ABSTRACT ^ CoreReflectionMethod::IS_STATIC;
 

@@ -7,10 +7,14 @@ use Exception;
 class SagaIdentifierGenerator
 {
     /**
-     * @throws Exception
+     * @throws IdentifierGenerationFailed
      */
     public function generateIdentifier(): string
     {
-        return \hash('sha256', \random_bytes(1024));
+        try {
+            return \hash('sha256', \random_bytes(1024));
+        } catch (Exception $exception) {
+            throw IdentifierGenerationFailed::forAlgoAndException('sha256', $exception);
+        }
     }
 }

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Exception;
+namespace Brzuchal\Saga\Mapping;
 
 use Exception;
 
-final class IncompleteMetadata extends Exception
+final class IncompleteSagaMetadata extends Exception
 {
     /**
      * @psalm-param class-string $sagaClass

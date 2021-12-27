@@ -3,7 +3,6 @@
 namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use Brzuchal\Saga\Exception\IncompleteMetadata;
 use Closure;
 
 final class SagaMetadata
@@ -31,33 +30,33 @@ final class SagaMetadata
     }
 
     /**
-     * @throws IncompleteMetadata
+     * @throws IncompleteSagaMetadata
      */
     public function resolveAssociation(object $message): AssociationValue
     {
         $class = \get_class($message);
         $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
-            throw IncompleteMetadata::unsupportedMessageType($this->getName(), $class);
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->getName(), $class);
         }
 
         $associationValue = $methodMetadata->getAssociationResolver()->resolve($message);
         if ($associationValue === null) {
-            throw IncompleteMetadata::missingAssociationResolver($this->getName(), $class);
+            throw IncompleteSagaMetadata::missingAssociationResolver($this->getName(), $class);
         }
 
         return $associationValue;
     }
 
     /**
-     * @throws IncompleteMetadata
+     * @throws IncompleteSagaMetadata
      */
     public function findHandlerMethod(object $message): string
     {
         $class = \get_class($message);
         $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
-            throw IncompleteMetadata::unsupportedMessageType($this->getName(), $class);
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->getName(), $class);
         }
 
         return $methodMetadata->getName();

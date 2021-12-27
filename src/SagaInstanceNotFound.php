@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Exception;
+namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use DomainException;
+use Exception;
 
-final class InstanceNotFound extends DomainException
+final class SagaInstanceNotFound extends Exception
 {
     /**
      * @param class-string $type
