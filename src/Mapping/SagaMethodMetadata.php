@@ -3,6 +3,7 @@
 namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
+use Brzuchal\Saga\SagaCreationPolicy;
 
 final class SagaMethodMetadata
 {
@@ -11,6 +12,7 @@ final class SagaMethodMetadata
         /** @psalm-var list<class-string> */
         protected array $types,
         protected AssociationResolver $associationResolver,
+        protected SagaCreationPolicy $creationPolicy = SagaCreationPolicy::NONE,
     ) {
     }
 
@@ -32,4 +34,8 @@ final class SagaMethodMetadata
         return $this->types;
     }
 
+    public function getCreationPolicy(): SagaCreationPolicy
+    {
+        return $this->creationPolicy;
+    }
 }

@@ -5,6 +5,7 @@ namespace Brzuchal\Saga\Mapping;
 use Brzuchal\Saga\Association\AssociationResolver;
 use Brzuchal\Saga\Association\PropertyNameEvaluator;
 use Brzuchal\Saga\Factory\ReflectionClassFactory;
+use Brzuchal\Saga\SagaCreationPolicy;
 use Closure;
 use ReflectionMethod as CoreReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionClass;
@@ -50,13 +51,7 @@ final class AttributeMappingDriver implements MappingDriver
                 ));
             }
             $parameterTypes = $this->extractMethodParameterTypes($method);
-            // TODO: implement start flag on SagaMethodMetadata
-//            $startAttribute = $this->extractStartAttribute($method);
-//            $startMethod = $startAttribute instanceof SagaStart;
-//            $forceNew = false;
-//            if ($startAttribute) {
-//                $forceNew = $startAttribute->forceNew;
-//            }
+            $creationPolicy = $this->extractCreationPolicy($method);
 
             // TODO: replace with use of factory of association value evaluator
             \assert($eventHandlerAttribute->property !== null);
@@ -67,6 +62,7 @@ final class AttributeMappingDriver implements MappingDriver
                     $eventHandlerAttribute->key,
                     new PropertyNameEvaluator($eventHandlerAttribute->property),
                 ),
+                creationPolicy: $creationPolicy,
             );
         }
 
@@ -150,5 +146,19 @@ final class AttributeMappingDriver implements MappingDriver
         }
 
         return $types;
+    }
+
+    protected function extractCreationPolicy(ReflectionMethod $method): SagaCreationPolicy
+    {
+        $startAttribute = $this->extractStartAttribute($method);
+        if ($startAttribute === null) {
+            return SagaCreationPolicy::NONE;
+        }
+
+        if ($startAttribute->forceNew) {
+            return SagaCreationPolicy::ALWAYS;
+        }
+
+        return SagaCreationPolicy::IF_NONE_FOUND;
     }
 }
