@@ -4,79 +4,76 @@ namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
-use Brzuchal\Saga\Mapping\SagaMetadataRepository;
-use Brzuchal\Saga\Store\SagaStore;
-use Exception;
+use Brzuchal\Saga\Mapping\SagaMetadata;
 
+/**
+ * Basic implementation of {@see SagaInstance} management for single {@see SagaMetadata} type.
+ * Provides support for Saga lifecycle management and handling of events.
+ */
 final class SagaManager
 {
     public function __construct(
-        protected SagaStore $store,
-        protected SagaMetadataRepository $repository,
-        protected SagaIdentifierGenerator $identifierGenerator = new SagaIdentifierGenerator(),
+        protected SagaRepository $repository,
     ) {
     }
 
     /**
      * @throws SagaInstanceNotFound
      * @throws IncompleteSagaMetadata
+     * @throws SagaRejected
      */
     public function __invoke(object $message): void
     {
-        $sagas = $this->repository->findByMessage($message);
-        $nonInvokedSagaTypes = \array_keys($sagas);
-        foreach ($sagas as $type => $metadata) {
-            $associationValue = $metadata->resolveAssociation($message);
-            foreach ($this->store->findSagas($type, $associationValue) as $identifier) {
-                // at this point we also need to filter closed instances
-                $saga = $this->store->loadSaga($type, $identifier);
-                if ($saga === null) {
-                    throw SagaInstanceNotFound::unableToLoad($type, $associationValue);
-                }
-
-                $this->doInvokeSaga($saga, $message, $associationValue);
-                unset($nonInvokedSagaTypes[\array_search($type, $nonInvokedSagaTypes, true)]);
-            }
+        $nonInvokedSaga = true;
+        foreach ($this->repository->findSagas($message, active: true) as $identifier) {
+            $this->doInvokeSaga($this->repository->loadSaga($identifier), $message);
+            $nonInvokedSaga = false;
         }
-        if (!empty($nonInvokedSagaTypes)) {
-            foreach ($nonInvokedSagaTypes as $type) {
-                $metadata = $sagas[$type];
-                $associationValue = $metadata->resolveAssociation($message);
-                // TODO: verify metadata instantiation policy
-                $this->startNewSaga($type, $message, $associationValue);
-            }
+
+        $initializationPolicy = $this->repository->initializationPolicy($message);
+        if ($this->shouldCreateNewSaga($nonInvokedSaga, $initializationPolicy)) {
+            $this->startNewSaga($message, $initializationPolicy->initialAssociationValue());
         }
     }
 
     /**
      * @throws IncompleteSagaMetadata
+     * @throws SagaRejected
      */
-    protected function doInvokeSaga(object $instance, object $message, AssociationValue $associationValue): void
+    protected function doInvokeSaga(SagaInstance $instance, object $message): void
     {
-        $metadata = $this->repository->find(\get_class($instance));
-        $method = $metadata->findHandlerMethod($message);
-        $lifecycle = new SagaLifecycle(true, [$associationValue]);
-        $instance->{$method}($message, $lifecycle);
+        if (!$instance->canHandle($message)) {
+            return;
+        }
+
+        $instance->handle($message);
+        $this->repository->storeSaga($instance);
     }
 
     /**
-     * @param class-string $type
      * @throws IncompleteSagaMetadata
-     * @throws IdentifierGenerationFailed
+     * @throws SagaRejected
      */
-    protected function startNewSaga(string $type, object $message, AssociationValue $associationValue): void
+    protected function startNewSaga(object $message, AssociationValue $associationValue): void
     {
-        $metadata = $this->repository->find($type);
-        $instance = $metadata->newInstance();
+        $instance = $this->repository->createNewSaga($message, $associationValue);
+        if ($instance === null) {
+            return;
+        }
 
-        $lifecycle = new SagaLifecycle(true, [$associationValue]);
-        $method = $metadata->findHandlerMethod($message);
-        $instance->{$method}($message, $lifecycle);
-        $this->store->insertSaga(
-            $metadata->getName(),
-            $this->identifierGenerator->generateIdentifier(),
-            $instance,
-            $lifecycle->associationValues(),
-        );
+        $this->doInvokeSaga($instance, $message);
+    }
+
+    protected function shouldCreateNewSaga(bool $nonInvokedSaga, SagaInitializationPolicy $initializationPolicy): bool
+    {
+        if ($initializationPolicy->createAlways()) {
+            return true;
+        }
+
+        if ($initializationPolicy->createIfNoneFound() && $nonInvokedSaga === true) {
+            return true;
+        }
+
+        return false;
     }
 }

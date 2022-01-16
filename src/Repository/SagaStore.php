@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Store;
+namespace Brzuchal\Saga\Repository;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\SagaInstanceNotFound;
 
 /**
  * Provides a mechanism to find, load update or delete sagas from the underlying storage.
@@ -17,8 +18,9 @@ interface SagaStore
 
     /**
      * @psalm-param class-string $type
+     * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store
      */
-    public function loadSaga(string $type, string $identifier): object|null;
+    public function loadSaga(string $type, string $identifier): SagaStoreEntry;
 
     /**
      * @psalm-param class-string $type
@@ -27,13 +29,13 @@ interface SagaStore
 
     /**
      * @psalm-param class-string $type
-     * @psalm-param iterable<AssociationValue> $associationValues
+     * @psalm-param list<AssociationValue> $associationValues
      */
-    public function insertSaga(string $type, string $identifier, object $saga, iterable $associationValues): void;
+    public function insertSaga(string $type, string $identifier, object $saga, array $associationValues): void;
 
     /**
      * @psalm-param class-string $type
-     * @psalm-param iterable<AssociationValue> $associationValues
+     * @psalm-param list<AssociationValue> $associationValues
      */
-    public function updateSaga(string $type, string $identifier, object $saga, iterable $associationValues): void;
+    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues): void;
 }

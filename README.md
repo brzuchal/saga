@@ -33,17 +33,16 @@ class OrderProcessing
 use App\OrderProcessing;
 use App\Events\OrderCreated;
 use Brzuchal\Saga\Mapping\AttributeMappingDriver;
-use Brzuchal\Saga\Mapping\SagaMetadataRepository;
+use Brzuchal\Saga\Mapping\SagaMetadataFactory;
+use Brzuchal\Saga\SagaRepositoryFactory;
 use Brzuchal\Saga\SagaManager;
-use Brzuchal\Saga\Store\InMemorySagaStore;
+use Brzuchal\Saga\Repository\InMemorySagaStore;
 
-$metadataFactory = new AttributeMappingDriver();
-$metadataRepository = new SagaMetadataRepository([
-    $metadataFactory->loadMetadataForClass(OrderProcessing::class);
-]);
-$store = new InMemorySagaStore();
-$manager = new SagaManager($store, $metadataRepository)
+$repositoryFactory = new SagaRepositoryFactory(
+    new InMemorySagaStore(), 
+    new SagaMetadataFactory([new AttributeMappingDriver()]),
+);
 
-$event = new OrderCreated();
-$manager($event);
+$manager = new SagaManager($repositoryFactory->create(OrderProcessing::class));
+$manager(new OrderCreated());
 ```

@@ -1,0 +1,70 @@
+---
+title: Class Mapping
+description: Basic mapping of the Saga methods and association values
+weight: 10
+---
+= Class Mapping
+
+This guide explains the basic mapping of the Saga methods and association values.
+After working through this guide you should know:
+
+- How to create PHP objects implementing long-running process base;
+- How to configure the mapping between methods and messages;
+- What association values are and how they help to determine specific Saga instance;
+- Defining association values evaluators of different kinds SagaManager use;
+
+== Introduction
+
+The important part of a long-running process is its behavior. Just like regular message handlers, the behavior of a saga is implemented via the handler methods for the message types to be handled.
+
+
+=== Starting saga
+
+Since a saga manages the state of a long-running process, under which conditions should a new saga be created? Sagas are, in essence, a message driven state machine. The trigger to start this state machine is the arrival of one or more specified message types.
+
+Considering for eg. a order processing saga an `OrderCreated` could be the initiating event triggering the start of the process.
+
+.Example saga
+[source,php]
+----
+namespace App;
+
+use App\Events\OrderCreated;
+
+class OrderProcessing
+{
+    public function whenCreated(OrderCreated $event): void
+    {
+        // ...
+    }
+}
+----
+
+One way of starting saga is declared by mapping on an event handler method indicating start of the saga process.
+
+Methods having the `#[SagaMessageHandler]` attribute can trigger the creation of a new Saga instance.
+When a Saga is started due to an invocation on a method including SagaStart attribute, the association of the method and the actual property's value are used to define a `AssociationValue` for the created saga.
+
+.Using attributes
+[source,php]
+----
+namespace App;
+
+use App\Events\OrderCreated;
+use Brzuchal\Saga\Mapping\Saga;
+use Brzuchal\Saga\Mapping\SagaMessageHandler;
+use Brzuchal\Saga\Mapping\SagaStart;
+
+#[Saga]
+class OrderProcessing
+{
+    #[SagaStart,SagaMessageHandler(key: 'orderId', property: 'id')]
+    public function whenCreated(OrderCreated $event): void
+    {
+        // ...
+    }
+}
+----
+
+Handling `OrderCreated` message will always trigger the creation of a saga that can be found with an AssociationValue with key "orderId" and as value the value `OrderCreated` message `$id` property value.
+This annotation can only appear on methods that have `#[SagaMessageHandler]` attribute'.

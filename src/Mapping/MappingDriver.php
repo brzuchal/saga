@@ -7,5 +7,5 @@ interface MappingDriver
     /**
      * @psalm-param class-string $class
      */
-    public function loadMetadataForClass(string $class): SagaMetadata;
+    public function loadMetadataForClass(string $class): SagaMetadata|null;
 }
