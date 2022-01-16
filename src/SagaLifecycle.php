@@ -43,8 +43,13 @@ final class SagaLifecycle
     /**
      * @psalm-return list<AssociationValue>
      */
-    public function associationValues(): array
+    public function getAssociationValues(): array
     {
         return $this->associationValues;
+    }
+
+    public function getState(): SagaState
+    {
+        return $this->state;
     }
 }

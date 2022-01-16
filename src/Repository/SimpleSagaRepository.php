@@ -2,10 +2,13 @@
 
 namespace Brzuchal\Saga\Repository;
 
+use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\IdentifierGenerationFailed;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadata;
+use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaIdentifierGenerator;
+use Brzuchal\Saga\SagaInitializationPolicy;
 use Brzuchal\Saga\SagaInstance;
 use Brzuchal\Saga\SagaRepository;
 
@@ -45,16 +48,10 @@ class SimpleSagaRepository implements SagaRepository
     }
 
     /**
-     * @throws IncompleteSagaMetadata
      * @throws IdentifierGenerationFailed
      */
-    public function createNewSaga(object $message): SagaInstance|null
+    public function createNewSaga(object $message, AssociationValue $associationValue): SagaInstance|null
     {
-        if (!$this->isCreationPolicySatisfied($message)) {
-            return null;
-        }
-
-        $associationValue = $this->metadata->resolveAssociation($message);
         $instance = new SagaInstance(
             $this->identifierGenerator->generateIdentifier(),
             $this->metadata->newInstance(),
@@ -65,7 +62,7 @@ class SimpleSagaRepository implements SagaRepository
             $instance->getType(),
             $instance->id,
             $instance->instance,
-            $instance->associationValues(),
+            $instance->getAssociationValues(),
         );
 
         return $instance;
@@ -82,14 +79,18 @@ class SimpleSagaRepository implements SagaRepository
             $instance->getType(),
             $instance->id,
             $instance->instance,
-            $instance->associationValues(),
+            $instance->getAssociationValues(),
         );
     }
 
-    private function isCreationPolicySatisfied(
-        /** @psalm-suppress UnusedParam */
-        object $message,
-    ): bool {
-        return true;
+    /**
+     * @throws IncompleteSagaMetadata
+     */
+    public function initializationPolicy(object $message): SagaInitializationPolicy
+    {
+        return new SagaInitializationPolicy(
+            $this->metadata->getSagaCreationPolicy($message),
+            $this->metadata->resolveAssociation($message),
+        );
     }
 }

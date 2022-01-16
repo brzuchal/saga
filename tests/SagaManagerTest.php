@@ -9,6 +9,7 @@ use Brzuchal\Saga\Mapping\MappingDriver;
 use Brzuchal\Saga\Mapping\SagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadataFactory;
 use Brzuchal\Saga\Mapping\SagaMethodMetadata;
+use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaIdentifierGenerator;
 use Brzuchal\Saga\SagaManager;
 use Brzuchal\Saga\Repository\InMemorySagaStore;
@@ -42,12 +43,13 @@ class SagaManagerTest extends TestCase
                                 new SagaMethodMetadata(
                                     'foo',
                                     [FooMessage::class],
-                                    new AssociationResolver('id', new PropertyNameEvaluator('id'))
+                                    new AssociationResolver('id', new PropertyNameEvaluator('id')),
+                                    SagaCreationPolicy::IF_NONE_FOUND,
                                 ),
                                 new SagaMethodMetadata(
                                     'bar',
                                     [BarMessage::class],
-                                    new AssociationResolver('str', new PropertyNameEvaluator('bar'))
+                                    new AssociationResolver('str', new PropertyNameEvaluator('bar')),
                                 ),
                             ],
                         );

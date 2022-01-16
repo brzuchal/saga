@@ -2,6 +2,7 @@
 
 namespace Brzuchal\Saga;
 
+use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadata;
 
@@ -19,6 +20,7 @@ final class SagaManager
     /**
      * @throws SagaInstanceNotFound
      * @throws IncompleteSagaMetadata
+     * @throws SagaRejected
      */
     public function __invoke(object $message): void
     {
@@ -27,13 +29,16 @@ final class SagaManager
             $this->doInvokeSaga($this->repository->loadSaga($identifier), $message);
             $nonInvokedSaga = false;
         }
-        if ($nonInvokedSaga === true) {
-            $this->startNewSaga($message);
+
+        $initializationPolicy = $this->repository->initializationPolicy($message);
+        if ($this->shouldCreateNewSaga($nonInvokedSaga, $initializationPolicy)) {
+            $this->startNewSaga($message, $initializationPolicy->initialAssociationValue());
         }
     }
 
     /**
      * @throws IncompleteSagaMetadata
+     * @throws SagaRejected
      */
     protected function doInvokeSaga(SagaInstance $instance, object $message): void
     {
@@ -47,14 +52,28 @@ final class SagaManager
 
     /**
      * @throws IncompleteSagaMetadata
+     * @throws SagaRejected
      */
-    protected function startNewSaga(object $message): void
+    protected function startNewSaga(object $message, AssociationValue $associationValue): void
     {
-        $instance = $this->repository->createNewSaga($message);
+        $instance = $this->repository->createNewSaga($message, $associationValue);
         if ($instance === null) {
             return;
         }
 
         $this->doInvokeSaga($instance, $message);
+    }
+
+    protected function shouldCreateNewSaga(bool $nonInvokedSaga, SagaInitializationPolicy $initializationPolicy): bool
+    {
+        if ($initializationPolicy->createAlways()) {
+            return true;
+        }
+
+        if ($initializationPolicy->createIfNoneFound() && $nonInvokedSaga === true) {
+            return true;
+        }
+
+        return false;
     }
 }

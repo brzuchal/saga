@@ -3,6 +3,7 @@
 namespace Brzuchal\Saga\Mapping;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\SagaCreationPolicy;
 use Closure;
 
 final class SagaMetadata
@@ -81,5 +82,15 @@ final class SagaMetadata
         }
 
         return null;
+    }
+
+    public function getSagaCreationPolicy(object $message): SagaCreationPolicy
+    {
+        $metadata = $this->findForArgumentType(\get_class($message));
+        if ($metadata === null) {
+            return SagaCreationPolicy::NONE;
+        }
+
+        return $metadata->getCreationPolicy();
     }
 }

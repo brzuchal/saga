@@ -2,6 +2,8 @@
 
 namespace Brzuchal\Saga;
 
+use Brzuchal\Saga\Association\AssociationValue;
+
 interface SagaRepository
 {
     /**
@@ -14,9 +16,11 @@ interface SagaRepository
      */
     public function loadSaga(string $identifier): SagaInstance;
 
-    public function createNewSaga(object $message): SagaInstance|null;
+    public function createNewSaga(object $message, AssociationValue $associationValue): SagaInstance|null;
 
     public function deleteSaga(string $identifier): void;
 
     public function storeSaga(SagaInstance $instance): void;
+
+    public function initializationPolicy(object $message): SagaInitializationPolicy;
 }

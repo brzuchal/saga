@@ -13,7 +13,7 @@ use Brzuchal\Saga\Association\AssociationValue;
  * Describes the conditions under which a Saga should be created, and which {@see AssociationValue}
  * it should be initialized with.
  */
-class SagaInitializationPolicy
+final class SagaInitializationPolicy
 {
     /**
      * Creates an instance using the given {@see self::creationPolicy()} and {@see self::initialAssociationValue()}.
@@ -22,27 +22,22 @@ class SagaInitializationPolicy
      * @param AssociationValue $initialAssociationValue The association value a new Saga instance should be given
      */
     public function __construct(
-        private SagaCreationPolicy $creationPolicy,
-        private AssociationValue $initialAssociationValue,
+        protected SagaCreationPolicy $creationPolicy,
+        protected AssociationValue $initialAssociationValue,
     ) {
     }
 
-    /**
-     * Returns the creation policy
-     *
-     * @return SagaCreationPolicy the creation policy
-     */
-    public function getCreationPolicy(): SagaCreationPolicy
+    public function createAlways(): bool
     {
-        return $this->creationPolicy;
+        return $this->creationPolicy === SagaCreationPolicy::ALWAYS;
     }
 
-    /**
-     * Returns the initial association value for a newly created saga. May be {@code null}.
-     *
-     * @return AssociationValue the initial association value for a newly created saga
-     */
-    public function getInitialAssociationValue(): AssociationValue
+    public function createIfNoneFound(): bool
+    {
+        return $this->creationPolicy === SagaCreationPolicy::IF_NONE_FOUND;
+    }
+
+    public function initialAssociationValue(): AssociationValue
     {
         return $this->initialAssociationValue;
     }

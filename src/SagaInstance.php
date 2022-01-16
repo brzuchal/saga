@@ -5,6 +5,7 @@ namespace Brzuchal\Saga;
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadata;
+use Exception;
 
 final class SagaInstance
 {
@@ -53,18 +54,28 @@ final class SagaInstance
 
     /**
      * @throws IncompleteSagaMetadata
+     * @throws SagaRejected
      */
     public function handle(object $message): void
     {
         $method = $this->metadata->findHandlerMethod($message);
-        $this->instance->{$method}($message, $this->getLifecycle());
-        // TODO: apply lifecycle state and merge association values
+        $lifecycle = $this->getLifecycle();
+        try {
+            $this->instance->{$method}($message, $lifecycle);
+        } catch (SagaRejected $exception) {
+            throw $exception;
+        } catch (Exception $exception) {
+            $lifecycle->reject($exception);
+        } finally {
+            $this->associationValues = $lifecycle->getAssociationValues();
+            $this->state = $lifecycle->getState();
+        }
     }
 
     /**
      * @psalm-return list<AssociationValue>
      */
-    public function associationValues(): array
+    public function getAssociationValues(): array
     {
         return $this->associationValues;
     }
