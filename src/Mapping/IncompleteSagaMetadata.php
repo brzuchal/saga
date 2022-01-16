@@ -31,4 +31,17 @@ final class IncompleteSagaMetadata extends Exception
             $sagaClass,
         ));
     }
+
+    /**
+     * @psalm-param class-string $sagaClass
+     * @psalm-param string $methodName
+     */
+    public static function cannotDetermineMessageType(string $sagaClass, string $methodName): self
+    {
+        return new self(\sprintf(
+            'Saga methods require at least one required parameter, none given in %s::%s',
+            $sagaClass,
+            $methodName,
+        ));
+    }
 }

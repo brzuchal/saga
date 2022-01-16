@@ -3,11 +3,12 @@
 namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Exception;
 
-class SagaLifecycle
+final class SagaLifecycle
 {
     public function __construct(
-        protected bool $active,
+        protected SagaState $state,
         /** @psalm-var list<AssociationValue> */
         protected array $associationValues,
     ) {
@@ -15,12 +16,21 @@ class SagaLifecycle
 
     public function isActive(): bool
     {
-        return $this->active;
+        return $this->state === SagaState::Pending;
     }
 
-    public function end(): void
+    public function complete(): void
     {
-        $this->active = false;
+        $this->state = SagaState::Completed;
+    }
+
+    /**
+     * @throws SagaRejected
+     */
+    public function reject(Exception $exception = null): void
+    {
+        $this->state = SagaState::Rejected;
+        throw SagaRejected::create($exception);
     }
 
     public function associateValue(string $key, mixed $value): self

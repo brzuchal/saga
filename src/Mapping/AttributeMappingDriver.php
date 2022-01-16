@@ -6,28 +6,37 @@ use Brzuchal\Saga\Association\AssociationResolver;
 use Brzuchal\Saga\Association\PropertyNameEvaluator;
 use Brzuchal\Saga\Factory\ReflectionClassFactory;
 use Brzuchal\Saga\SagaCreationPolicy;
-use Closure;
+use ReflectionException;
 use ReflectionMethod as CoreReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionClass;
 use Roave\BetterReflection\Reflection\ReflectionIntersectionType;
 use Roave\BetterReflection\Reflection\ReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionNamedType;
+use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
 use UnexpectedValueException;
 
 final class AttributeMappingDriver implements MappingDriver
 {
     private const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^ CoreReflectionMethod::IS_ABSTRACT ^ CoreReflectionMethod::IS_STATIC;
 
-    /** @inheritdoc */
-    public function loadMetadataForClass(string $class): SagaMetadata
+    /**
+     * @inheritdoc
+     * @throws ReflectionException
+     * @throws IncompleteSagaMetadata
+     */
+    public function loadMetadataForClass(string $class): SagaMetadata|null
     {
-        // TODO: rework
-        $reflection = ReflectionClass::createFromName($class);
+        try {
+            $reflection = ReflectionClass::createFromName($class);
+        } catch (IdentifierNotFound) {
+            return null;
+        }
+
         $factory = new ReflectionClassFactory($reflection->getName());
 
         return new SagaMetadata(
             $class,
-            Closure::fromCallable($factory),
+            $factory(...),
             $this->extractMethods($reflection),
         );
     }
@@ -44,11 +53,10 @@ final class AttributeMappingDriver implements MappingDriver
                 continue;
             }
             if ($method->getNumberOfRequiredParameters() < 1) {
-                throw new UnexpectedValueException(\sprintf(
-                    'Saga methods require at least one required parameter, none given in %s::%s',
+                throw IncompleteSagaMetadata::cannotDetermineMessageType(
                     $class->getName(),
                     $method->getName(),
-                ));
+                );
             }
             $parameterTypes = $this->extractMethodParameterTypes($method);
             $creationPolicy = $this->extractCreationPolicy($method);

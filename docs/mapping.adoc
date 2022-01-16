@@ -42,7 +42,7 @@ class OrderProcessing
 
 One way of starting saga is declared by mapping on an event handler method indicating start of the saga process.
 
-Methods having the `#[SagamessageHandler]` attribute can trigger the creation of a new Saga instance.
+Methods having the `#[SagaMessageHandler]` attribute can trigger the creation of a new Saga instance.
 When a Saga is started due to an invocation on a method including SagaStart attribute, the association of the method and the actual property's value are used to define a `AssociationValue` for the created saga.
 
 .Using attributes

@@ -10,13 +10,12 @@ final class SagaInstanceNotFound extends Exception
     /**
      * @param class-string $type
      */
-    public static function unableToLoad(string $type, AssociationValue $associationValue): self
+    public static function unableToLoad(string $type, string $identifier): self
     {
         return new self(\sprintf(
-            'Instance of %s Saga not found using association %s=%s',
+            'Instance of %s Saga identified by %s',
             $type,
-            $associationValue->getKey(),
-            (string) $associationValue->getValue(),
+            $identifier,
         ));
     }
 }
