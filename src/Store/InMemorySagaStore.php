@@ -1,14 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Repository;
+namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\Store\SimpleSagaStoreEntry;
+use Brzuchal\Saga\Repository\SagaStore;
+use Brzuchal\Saga\Repository\SagaStoreEntry;
 use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaState;
 
 final class InMemorySagaStore implements SagaStore
 {
-    /** @psalm-var array<class-string, array<string, InMemorySagaEntry>> */
+    /** @psalm-var array<class-string, array<string, SimpleSagaStoreEntry>> */
     protected array $instances = [];
 
     /** @inheritdoc */
@@ -55,40 +58,12 @@ final class InMemorySagaStore implements SagaStore
     /** @inheritdoc */
     public function insertSaga(string $type, string $identifier, object $saga, array $associationValues): void
     {
-        $this->instances[$type][$identifier] = new InMemorySagaEntry($saga, $associationValues);
+        $this->instances[$type][$identifier] = new SimpleSagaStoreEntry($saga, $associationValues);
     }
 
     /** @inheritdoc */
     public function updateSaga(string $type, string $identifier, object $saga, array $associationValues, SagaState $state): void
     {
-        $this->instances[$type][$identifier] = new InMemorySagaEntry($saga, $associationValues, $state);
-    }
-}
-
-/** @internal  */
-final class InMemorySagaEntry implements SagaStoreEntry
-{
-    public function __construct(
-        protected object $saga,
-        /** @psalm-var list<AssociationValue> */
-        protected array $associationValues,
-        protected SagaState $state = SagaState::Pending,
-    ) {
-    }
-
-    public function object(): object
-    {
-        return $this->saga;
-    }
-
-    /** @inheritdoc */
-    public function associationValues(): array
-    {
-        return $this->associationValues;
-    }
-
-    public function state(): SagaState
-    {
-        return $this->state;
+        $this->instances[$type][$identifier] = new SimpleSagaStoreEntry($saga, $associationValues, $state);
     }
 }

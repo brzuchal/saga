@@ -13,7 +13,7 @@ use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaIdentifierGenerator;
 use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaManager;
-use Brzuchal\Saga\Repository\InMemorySagaStore;
+use Brzuchal\Saga\Store\InMemorySagaStore;
 use Brzuchal\Saga\SagaRejected;
 use Brzuchal\Saga\SagaRepository;
 use Brzuchal\Saga\SagaRepositoryFactory;
