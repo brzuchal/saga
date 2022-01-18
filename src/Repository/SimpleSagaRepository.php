@@ -6,7 +6,6 @@ use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\IdentifierGenerationFailed;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadata;
-use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaIdentifierGenerator;
 use Brzuchal\Saga\SagaInitializationPolicy;
 use Brzuchal\Saga\SagaInstance;
@@ -20,10 +19,20 @@ class SimpleSagaRepository implements SagaRepository
         protected SagaIdentifierGenerator $identifierGenerator = new SagaIdentifierGenerator(),
     ) {}
 
+    public function getType(): string
+    {
+        return $this->metadata->getName();
+    }
+
+    public function supports(object $message): bool
+    {
+        return $this->metadata->hasHandlerMethod($message);
+    }
+
     /**
      * @throws IncompleteSagaMetadata
      */
-    public function findSagas(object $message, ?bool $active = null): iterable
+    public function findSagas(object $message): iterable
     {
         return $this->store->findSagas(
             $this->metadata->getName(),
@@ -80,6 +89,7 @@ class SimpleSagaRepository implements SagaRepository
             $instance->id,
             $instance->instance,
             $instance->getAssociationValues(),
+            $instance->getState(),
         );
     }
 

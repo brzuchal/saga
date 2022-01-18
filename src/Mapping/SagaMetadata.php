@@ -84,13 +84,31 @@ final class SagaMetadata
         return null;
     }
 
+    /**
+     * @throws IncompleteSagaMetadata
+     */
     public function getSagaCreationPolicy(object $message): SagaCreationPolicy
     {
-        $metadata = $this->findForArgumentType(\get_class($message));
+        $messageType = \get_class($message);
+        $metadata = $this->findForArgumentType($messageType);
         if ($metadata === null) {
-            return SagaCreationPolicy::NONE;
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->type, $messageType);
         }
 
         return $metadata->getCreationPolicy();
+    }
+
+    /**
+     * @throws IncompleteSagaMetadata
+     */
+    public function isCompleting(object $message): bool
+    {
+        $messageType = \get_class($message);
+        $metadata = $this->findForArgumentType($messageType);
+        if ($metadata === null) {
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->type, $messageType);
+        }
+
+        return $metadata->getEnd();
     }
 }

@@ -13,6 +13,7 @@ final class SagaMethodMetadata
         protected array $types,
         protected AssociationResolver $associationResolver,
         protected SagaCreationPolicy $creationPolicy = SagaCreationPolicy::NONE,
+        protected bool $end = false,
     ) {
     }
 
@@ -37,5 +38,10 @@ final class SagaMethodMetadata
     public function getCreationPolicy(): SagaCreationPolicy
     {
         return $this->creationPolicy;
+    }
+
+    public function getEnd(): bool
+    {
+        return $this->end;
     }
 }

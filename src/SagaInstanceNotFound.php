@@ -18,4 +18,17 @@ final class SagaInstanceNotFound extends Exception
             $identifier,
         ));
     }
+
+    /**
+     * @param class-string $type
+     */
+    public static function unableToFind(string $type, AssociationValue $associationValue): self
+    {
+        return new self(\sprintf(
+            'Instance of %s Saga identified by %s=%s',
+            $type,
+            $associationValue->getKey(),
+            (string) $associationValue->getValue(),
+        ));
+    }
 }

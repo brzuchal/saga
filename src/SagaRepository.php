@@ -7,9 +7,16 @@ use Brzuchal\Saga\Association\AssociationValue;
 interface SagaRepository
 {
     /**
+     * @return class-string
+     */
+    public function getType(): string;
+
+    public function supports(object $message): bool;
+
+    /**
      * @return list<string>
      */
-    public function findSagas(object $message, bool|null $active = null): iterable;
+    public function findSagas(object $message): iterable;
 
     /**
      * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store
