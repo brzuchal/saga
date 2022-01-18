@@ -62,6 +62,9 @@ final class SagaInstance
         $lifecycle = $this->getLifecycle();
         try {
             $this->instance->{$method}($message, $lifecycle);
+            if ($this->metadata->isCompleting($message)) {
+                $lifecycle->complete();
+            }
         } catch (SagaRejected $exception) {
             throw $exception;
         } catch (Exception $exception) {

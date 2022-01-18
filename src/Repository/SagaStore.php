@@ -4,6 +4,7 @@ namespace Brzuchal\Saga\Repository;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\SagaInstanceNotFound;
+use Brzuchal\Saga\SagaState;
 
 /**
  * Provides a mechanism to find, load update or delete sagas from the underlying storage.
@@ -37,5 +38,5 @@ interface SagaStore
      * @psalm-param class-string $type
      * @psalm-param list<AssociationValue> $associationValues
      */
-    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues): void;
+    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues, SagaState $state): void;
 }

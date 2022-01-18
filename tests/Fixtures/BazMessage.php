@@ -2,11 +2,13 @@
 
 namespace Brzuchal\Saga\Tests\Fixtures;
 
+use Exception;
+
 class BazMessage
 {
     public function __construct(
         public int $id = 123,
-        public readonly array $baz = [true],
+        public readonly Exception|null $exception = null,
     ) {
     }
 }

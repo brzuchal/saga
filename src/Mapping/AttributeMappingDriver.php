@@ -71,6 +71,7 @@ final class AttributeMappingDriver implements MappingDriver
                     new PropertyNameEvaluator($eventHandlerAttribute->property),
                 ),
                 creationPolicy: $creationPolicy,
+                end: $this->hasEndAttribute($method),
             );
         }
 
@@ -168,5 +169,15 @@ final class AttributeMappingDriver implements MappingDriver
         }
 
         return SagaCreationPolicy::IF_NONE_FOUND;
+    }
+
+    protected function hasEndAttribute(ReflectionMethod $method): bool
+    {
+        $attributes = $method->getAttributesByInstance(SagaStart::class);
+        if (empty($attributes)) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -59,9 +59,9 @@ final class InMemorySagaStore implements SagaStore
     }
 
     /** @inheritdoc */
-    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues): void
+    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues, SagaState $state): void
     {
-        $this->instances[$type][$identifier] = new InMemorySagaEntry($saga, $associationValues);
+        $this->instances[$type][$identifier] = new InMemorySagaEntry($saga, $associationValues, $state);
     }
 }
 
