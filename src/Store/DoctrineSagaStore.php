@@ -14,10 +14,13 @@ use Doctrine\DBAL\Types\Types;
 
 final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
 {
+    public const DEFAULT_ASSOC_TABLE_NAME = 'saga_assoc';
+    public const DEFAULT_DATA_TABLE_NAME = 'saga_data';
+
     public function __construct(
-        protected string $assocTableName,
-        protected string $dataTableName,
         protected Connection $connection,
+        protected string $assocTableName = self::DEFAULT_ASSOC_TABLE_NAME,
+        protected string $dataTableName = self::DEFAULT_DATA_TABLE_NAME,
     ) {}
 
     /**
@@ -27,7 +30,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     {
         return $this->connection
             ->prepare(
-            "SELECT saga_id FROM {$this->assocTableName} WHERE association_key = ? AND association_value = ? AND type = ?"
+            "SELECT saga_id FROM {$this->assocTableName} WHERE association_key = ? AND association_value = ? AND saga_type = ?"
             )
             ->executeQuery([
                 $associationValue->getKey(),
@@ -68,6 +71,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                 'id' => $identifier,
                 'type' => $type,
                 'serialized' => \serialize($saga),
+                'state' => SagaState::Pending->value,
             ]);
 
         foreach ($associationValues as $associationValue) {
@@ -91,6 +95,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
         $this->connection
             ->update($this->dataTableName, [
                 'serialized' => \serialize($saga),
+                'state' => $state->value
             ], [
                 'id' => $identifier,
                 'type' => $type,
@@ -178,6 +183,8 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
         $table->addColumn('type', Types::STRING)
             ->setNotnull(true);
         $table->addColumn('serialized', Types::TEXT)
+            ->setNotnull(true);
+        $table->addColumn('state', Types::SMALLINT)
             ->setNotnull(true);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['type']);
