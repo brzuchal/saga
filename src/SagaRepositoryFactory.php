@@ -3,7 +3,7 @@
 namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Mapping\SagaMetadataFactory;
-use Brzuchal\Saga\Repository\SagaStore;
+use Brzuchal\Saga\Store\SagaStore;
 use Brzuchal\Saga\Repository\SimpleSagaRepository;
 
 final class SagaRepositoryFactory

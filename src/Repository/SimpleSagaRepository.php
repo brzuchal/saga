@@ -3,6 +3,7 @@
 namespace Brzuchal\Saga\Repository;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\Association\AssociationValues;
 use Brzuchal\Saga\IdentifierGenerationFailed;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadata;
@@ -10,6 +11,7 @@ use Brzuchal\Saga\SagaIdentifierGenerator;
 use Brzuchal\Saga\SagaInitializationPolicy;
 use Brzuchal\Saga\SagaInstance;
 use Brzuchal\Saga\SagaRepository;
+use Brzuchal\Saga\Store\SagaStore;
 
 class SimpleSagaRepository implements SagaRepository
 {
@@ -21,7 +23,7 @@ class SimpleSagaRepository implements SagaRepository
 
     public function getType(): string
     {
-        return $this->metadata->getName();
+        return $this->metadata->getType();
     }
 
     public function supports(object $message): bool
@@ -35,7 +37,7 @@ class SimpleSagaRepository implements SagaRepository
     public function findSagas(object $message): iterable
     {
         return $this->store->findSagas(
-            $this->metadata->getName(),
+            $this->metadata->getType(),
             $this->metadata->resolveAssociation($message),
         );
     }
@@ -43,7 +45,7 @@ class SimpleSagaRepository implements SagaRepository
     public function loadSaga(string $identifier): SagaInstance
     {
         $entry = $this->store->loadSaga(
-            $this->metadata->getName(),
+            $this->metadata->getType(),
             $identifier,
         );
 
@@ -64,14 +66,14 @@ class SimpleSagaRepository implements SagaRepository
         $instance = new SagaInstance(
             $this->identifierGenerator->generateIdentifier(),
             $this->metadata->newInstance(),
-            [$associationValue],
+            new AssociationValues([$associationValue]),
             $this->metadata,
         );
         $this->store->insertSaga(
             $instance->getType(),
             $instance->id,
             $instance->instance,
-            $instance->getAssociationValues(),
+            $instance->associationValues,
         );
 
         return $instance;
@@ -79,7 +81,7 @@ class SimpleSagaRepository implements SagaRepository
 
     public function deleteSaga(string $identifier): void
     {
-        // TODO: Implement deleteSaga() method.
+        $this->store->deleteSaga($this->metadata->getType(), $identifier);
     }
 
     public function storeSaga(SagaInstance $instance): void
@@ -88,7 +90,7 @@ class SimpleSagaRepository implements SagaRepository
             $instance->getType(),
             $instance->id,
             $instance->instance,
-            $instance->getAssociationValues(),
+            $instance->associationValues,
             $instance->getState(),
         );
     }
@@ -99,7 +101,7 @@ class SimpleSagaRepository implements SagaRepository
     public function initializationPolicy(object $message): SagaInitializationPolicy
     {
         return new SagaInitializationPolicy(
-            $this->metadata->getSagaCreationPolicy($message),
+            $this->metadata->getCreationPolicy($message),
             $this->metadata->resolveAssociation($message),
         );
     }

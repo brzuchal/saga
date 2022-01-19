@@ -13,7 +13,7 @@ class Foo
     public function foo(FooMessage $message, SagaLifecycle $lifecycle): void
     {
         $this->fooInvoked = true;
-        $lifecycle->associateValue('str', 'bar');
+        $lifecycle->associateWith('str', 'bar');
     }
 
     public function bar(BarMessage $message, SagaLifecycle $lifecycle): void

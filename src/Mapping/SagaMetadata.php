@@ -10,7 +10,7 @@ final class SagaMetadata
 {
     public function __construct(
         /** @psalm-var class-string */
-        protected string $type,
+        protected readonly string $type,
         protected Closure $factory,
         /** @psalm-var list<SagaMethodMetadata> */
         protected array $methods,
@@ -20,7 +20,7 @@ final class SagaMetadata
     /**
      * @psalm-return class-string
      */
-    public function getName(): string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -38,12 +38,12 @@ final class SagaMetadata
         $class = \get_class($message);
         $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
-            throw IncompleteSagaMetadata::unsupportedMessageType($this->getName(), $class);
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->getType(), $class);
         }
 
         $associationValue = $methodMetadata->getAssociationResolver()->resolve($message);
         if ($associationValue === null) {
-            throw IncompleteSagaMetadata::missingAssociationResolver($this->getName(), $class);
+            throw IncompleteSagaMetadata::missingAssociationResolver($this->getType(), $class);
         }
 
         return $associationValue;
@@ -57,7 +57,7 @@ final class SagaMetadata
         $class = \get_class($message);
         $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
-            throw IncompleteSagaMetadata::unsupportedMessageType($this->getName(), $class);
+            throw IncompleteSagaMetadata::unsupportedMessageType($this->getType(), $class);
         }
 
         return $methodMetadata->getName();
@@ -87,7 +87,7 @@ final class SagaMetadata
     /**
      * @throws IncompleteSagaMetadata
      */
-    public function getSagaCreationPolicy(object $message): SagaCreationPolicy
+    public function getCreationPolicy(object $message): SagaCreationPolicy
     {
         $messageType = \get_class($message);
         $metadata = $this->findForArgumentType($messageType);

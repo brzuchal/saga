@@ -2,21 +2,17 @@
 
 namespace Brzuchal\Saga;
 
-use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\Association\AssociationValues;
 use Brzuchal\Saga\Mapping\IncompleteSagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadata;
 use Exception;
 
 final class SagaInstance
 {
-    /**
-     * @psalm-param list<AssociationValue> $associationValues
-     */
     public function __construct(
         public readonly string $id,
         public readonly object $instance,
-        /** @var list<AssociationValue> */
-        protected array $associationValues,
+        public readonly AssociationValues $associationValues,
         protected SagaMetadata $metadata,
         protected SagaState $state = SagaState::Pending,
     ) {
@@ -27,7 +23,7 @@ final class SagaInstance
      */
     public function getType(): string
     {
-        return $this->metadata->getName();
+        return $this->metadata->getType();
     }
 
     public function getLifecycle(): SagaLifecycle
@@ -49,7 +45,7 @@ final class SagaInstance
     public function canHandle(object $message): bool
     {
         return $this->state === SagaState::Pending
-            && $this->containsAssociationValue($this->metadata->resolveAssociation($message));
+            && $this->associationValues->contains($this->metadata->resolveAssociation($message));
     }
 
     /**
@@ -70,27 +66,7 @@ final class SagaInstance
         } catch (Exception $exception) {
             $lifecycle->reject($exception);
         } finally {
-            $this->associationValues = $lifecycle->getAssociationValues();
             $this->state = $lifecycle->getState();
         }
-    }
-
-    /**
-     * @psalm-return list<AssociationValue>
-     */
-    public function getAssociationValues(): array
-    {
-        return $this->associationValues;
-    }
-
-    protected function containsAssociationValue(AssociationValue $associationValue): bool
-    {
-        foreach ($this->associationValues as $existingAssociationValue) {
-            if ($existingAssociationValue->equals($associationValue)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

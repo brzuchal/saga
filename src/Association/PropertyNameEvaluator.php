@@ -2,7 +2,7 @@
 
 namespace Brzuchal\Saga\Association;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Stringable;
 
 final class PropertyNameEvaluator implements AssociationEvaluator
 {
@@ -11,7 +11,7 @@ final class PropertyNameEvaluator implements AssociationEvaluator
     ) {
     }
 
-    public function evaluate(object $object): string | int
+    public function evaluate(object $object): string|Stringable
     {
         if (\property_exists($object, $this->propertyName)) {
             return $object->{$this->propertyName};

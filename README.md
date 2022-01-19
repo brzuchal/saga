@@ -36,7 +36,7 @@ use Brzuchal\Saga\Mapping\AttributeMappingDriver;
 use Brzuchal\Saga\Mapping\SagaMetadataFactory;
 use Brzuchal\Saga\SagaRepositoryFactory;
 use Brzuchal\Saga\SagaManager;
-use Brzuchal\Saga\Repository\InMemorySagaStore;
+use Brzuchal\Saga\Store\InMemorySagaStore;
 
 $repositoryFactory = new SagaRepositoryFactory(
     new InMemorySagaStore(), 

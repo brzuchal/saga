@@ -28,7 +28,7 @@ final class SagaInstanceNotFound extends Exception
             'Instance of %s Saga identified by %s=%s',
             $type,
             $associationValue->getKey(),
-            (string) $associationValue->getValue(),
+            $associationValue->getValue(),
         ));
     }
 }

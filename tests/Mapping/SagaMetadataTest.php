@@ -27,8 +27,9 @@ class SagaMetadataTest extends TestCase
             \Closure::fromCallable(new ReflectionClassFactory(Foo::class)),
             [$methodMetadata],
         );
-        $associationValue = $metadata->resolveAssociation(new FooMessage());
-        $this->assertEquals(123, $associationValue->getValue());
+        $message = new FooMessage();
+        $associationValue = $metadata->resolveAssociation($message);
+        $this->assertEquals($message->getId(), $associationValue->getValue());
         $this->assertEquals('fooId', $associationValue->getKey());
     }
 
@@ -49,8 +50,9 @@ class SagaMetadataTest extends TestCase
             \Closure::fromCallable(new ReflectionClassFactory(Foo::class)),
             [$foo, $fooBar],
         );
-        $associationValue = $metadata->resolveAssociation(new FooMessage());
-        $this->assertEquals(123, $associationValue->getValue());
+        $message = new FooMessage();
+        $associationValue = $metadata->resolveAssociation($message);
+        $this->assertEquals($message->getId(), $associationValue->getValue());
         $this->assertEquals('fooId', $associationValue->getKey());
     }
 }

@@ -3,14 +3,14 @@
 namespace Brzuchal\Saga;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\Association\AssociationValues;
 use Exception;
 
 final class SagaLifecycle
 {
     public function __construct(
         protected SagaState $state,
-        /** @psalm-var list<AssociationValue> */
-        protected array $associationValues,
+        public readonly AssociationValues $associationValues,
     ) {
     }
 
@@ -33,19 +33,18 @@ final class SagaLifecycle
         throw SagaRejected::create($exception);
     }
 
-    public function associateValue(string $key, mixed $value): self
+    public function associateWith(string $key, mixed $value): self
     {
-        $this->associationValues[] = new AssociationValue($key, $value);
+        $this->associationValues->add(new AssociationValue($key, $value));
 
         return $this;
     }
 
-    /**
-     * @psalm-return list<AssociationValue>
-     */
-    public function getAssociationValues(): array
+    public function removeAssociationWith(string $key, mixed $value): self
     {
-        return $this->associationValues;
+        $this->associationValues->remove(new AssociationValue($key, $value));
+
+        return $this;
     }
 
     public function getState(): SagaState
