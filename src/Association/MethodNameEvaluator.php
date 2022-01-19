@@ -3,6 +3,7 @@
 namespace Brzuchal\Saga\Association;
 
 use RuntimeException;
+use Stringable;
 
 final class MethodNameEvaluator implements AssociationEvaluator
 {
@@ -11,7 +12,7 @@ final class MethodNameEvaluator implements AssociationEvaluator
     ) {
     }
 
-    public function evaluate(object $object): string | int
+    public function evaluate(object $object): string|Stringable
     {
         if (\method_exists($object, $this->methodName)) {
             return $object->{$this->methodName}();

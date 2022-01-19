@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Repository;
+namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
+use Brzuchal\Saga\Association\AssociationValues;
 use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaState;
 
@@ -30,13 +31,11 @@ interface SagaStore
 
     /**
      * @psalm-param class-string $type
-     * @psalm-param list<AssociationValue> $associationValues
      */
-    public function insertSaga(string $type, string $identifier, object $saga, array $associationValues): void;
+    public function insertSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues): void;
 
     /**
      * @psalm-param class-string $type
-     * @psalm-param list<AssociationValue> $associationValues
      */
-    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues, SagaState $state): void;
+    public function updateSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues, SagaState $state): void;
 }

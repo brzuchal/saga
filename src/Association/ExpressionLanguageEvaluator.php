@@ -3,6 +3,7 @@
 namespace Brzuchal\Saga\Association;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Stringable;
 
 final class ExpressionLanguageEvaluator implements AssociationEvaluator
 {
@@ -17,7 +18,7 @@ final class ExpressionLanguageEvaluator implements AssociationEvaluator
     ) {
     }
 
-    public function evaluate(object $object): string | int
+    public function evaluate(object $object): string|Stringable
     {
         static $expression;
         $expression ??= new ExpressionLanguage();

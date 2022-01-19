@@ -83,11 +83,12 @@ class SagaManagerTest extends TestCase
     public function testInstanceCreation(): void
     {
         $manager = new SagaManager($this->repository);
-        $manager(new FooMessage(456));
+        $id = 'c09a27cc-c17a-46eb-bc15-e59bab41b766';
+        $manager(new FooMessage($id));
 
         $identifiers = $this->store->findSagas(
             Foo::class,
-            new AssociationValue('id', 456),
+            new AssociationValue('id', $id),
         );
         $this->assertNotEmpty($identifiers);
         $entry = $this->repository->loadSaga($identifiers[0]);
@@ -102,7 +103,7 @@ class SagaManagerTest extends TestCase
     public function testInvokeOnInstance(): void
     {
         $manager = new SagaManager($this->repository);
-        $manager(new FooMessage(456));
+        $manager(new FooMessage('6816aea8-404a-4598-b748-cfcaedbb886b'));
         $manager(new BarMessage());
         $identifiers = $this->store->findSagas(
             Foo::class,
@@ -126,11 +127,12 @@ class SagaManagerTest extends TestCase
     public function testEndInvokeAndSagaCompletion(): void
     {
         $manager = new SagaManager($this->repository);
-        $manager(new FooMessage(456));
-        $manager(new BazMessage(456));
+        $id = '97e7633c-e66c-4d48-b8fe-cd9cde1d3fa6';
+        $manager(new FooMessage($id));
+        $manager(new BazMessage($id));
         $identifiers = $this->store->findSagas(
             Foo::class,
-            new AssociationValue('id', 456),
+            new AssociationValue('id', $id),
         );
 
         $this->assertNotEmpty($identifiers);
@@ -144,12 +146,13 @@ class SagaManagerTest extends TestCase
     public function testRejectionByMethod(): void
     {
         $manager = new SagaManager($this->repository);
-        $manager(new FooMessage(456));
+        $id = '6d46ab6d-5433-4692-8344-df00ba832ba0';
+        $manager(new FooMessage($id));
         $this->expectException(SagaRejected::class);
         $manager(new BarMessage(exception: new RuntimeException('Intentional failure')));
         $identifiers = $this->store->findSagas(
             Foo::class,
-            new AssociationValue('id', 456),
+            new AssociationValue('id', $id),
         );
 
         $this->assertNotEmpty($identifiers);
@@ -163,12 +166,13 @@ class SagaManagerTest extends TestCase
     public function testRejection(): void
     {
         $manager = new SagaManager($this->repository);
-        $manager(new FooMessage(456));
+        $id = 'b4d353d9-a30a-4a63-861f-034b078f0904';
+        $manager(new FooMessage($id));
         $this->expectException(SagaRejected::class);
-        $manager(new BazMessage(456, new RuntimeException('Intentional failure')));
+        $manager(new BazMessage($id, new RuntimeException('Intentional failure')));
         $identifiers = $this->store->findSagas(
             Foo::class,
-            new AssociationValue('id', 456),
+            new AssociationValue('id', $id),
         );
 
         $this->assertNotEmpty($identifiers);

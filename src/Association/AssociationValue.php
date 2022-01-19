@@ -2,12 +2,17 @@
 
 namespace Brzuchal\Saga\Association;
 
+use Stringable;
+
 final class AssociationValue
 {
+    protected string $value;
+
     public function __construct(
         protected string $key,
-        protected mixed $value,
+        string|Stringable $value,
     ) {
+        $this->value = (string) $value;
     }
 
     public function getKey(): string
@@ -15,15 +20,18 @@ final class AssociationValue
         return $this->key;
     }
 
-    public function getValue(): mixed
+    public function getValue(): string
     {
         return $this->value;
     }
 
     public function equals(self $other): bool
     {
-        return $this->key === $other->key &&
-            \get_debug_type($this->value) === \get_debug_type($other->value) &&
-            $this->value === $other->value;
+        if ($this === $other) {
+            return true;
+        }
+
+        return $this->key === $other->key
+            && $this->value === $other->value;
     }
 }

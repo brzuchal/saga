@@ -3,8 +3,8 @@
 namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use Brzuchal\Saga\Repository\SagaStore;
-use Brzuchal\Saga\Repository\SagaStoreEntry;
+use Brzuchal\Saga\Association\AssociationValues;
+use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaState;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -42,6 +42,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
 
     /**
      * @throws Exception
+     * @throws SagaInstanceNotFound
      */
     public function loadSaga(string $type, string $identifier): SagaStoreEntry
     {
@@ -50,6 +51,10 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
             ->executeQuery([$identifier])
             ->fetchAssociative();
 
+        if ($entry === false) {
+            throw SagaInstanceNotFound::unableToLoad($type, $identifier);
+        }
+
         return new SimpleSagaStoreEntry(
             \unserialize($entry['serialized']),
             $this->readAssociationValues($identifier),
@@ -57,13 +62,30 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function deleteSaga(string $type, string $identifier): void
     {
-        // TODO: Implement deleteSaga() method.
+        $this->connection->beginTransaction();
+        $this->connection
+            ->delete($this->dataTableName, [
+                'id' => $identifier,
+                'type' => $type,
+            ]);
+        $this->connection
+            ->delete($this->assocTableName, [
+                'saga_id' => $identifier,
+                'saga_type' => $type,
+            ]);
+        $this->connection->commit();
     }
 
-    /** @inheritdoc */
-    public function insertSaga(string $type, string $identifier, object $saga, array $associationValues): void
+    /**
+     * @inheritdoc
+     * @throws Exception
+     */
+    public function insertSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues): void
     {
         $this->connection->beginTransaction();
         $this->connection
@@ -89,7 +111,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     /**
      * @throws Exception
      */
-    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues, SagaState $state): void
+    public function updateSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues, SagaState $state): void
     {
         $this->connection->beginTransaction();
         $this->connection
@@ -101,16 +123,18 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                 'type' => $type,
             ]);
 
-        $newAssociationValues = $associationValues;
-        $associationValues = $this->readAssociationValues($identifier);
-
-        foreach ($newAssociationValues as $associationValue) {
-            if ($this->associationValuesContains($associationValues, $associationValue)) {
-                continue;
-            }
-
+        foreach ($associationValues->addedAssociations() as $associationValue) {
             $this->connection
                 ->insert($this->assocTableName, [
+                    'saga_id' => $identifier,
+                    'saga_type' => $type,
+                    'association_key' => $associationValue->getKey(),
+                    'association_value' => $associationValue->getValue(),
+                ]);
+        }
+        foreach ($associationValues->removedAssociations() as $associationValue) {
+            $this->connection
+                ->delete($this->assocTableName, [
                     'saga_id' => $identifier,
                     'saga_type' => $type,
                     'association_key' => $associationValue->getKey(),
@@ -121,39 +145,19 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     }
 
     /**
-     * @psalm-return list<AssociationValue>
      * @throws Exception
      */
-    protected function readAssociationValues(string $identifier): array
+    protected function readAssociationValues(string $identifier): AssociationValues
     {
         $assocList = $this->connection
             ->prepare("SELECT association_key, association_value FROM {$this->assocTableName} WHERE saga_id = ?")
             ->executeQuery([$identifier])
             ->fetchAllAssociative();
 
-        return \array_map(
-            fn($assoc) => new AssociationValue($assoc['association_key'], $assoc['association_value']),
+        return new AssociationValues(\array_map(
+            static fn (array $assoc) => new AssociationValue($assoc['association_key'], $assoc['association_value']),
             $assocList,
-        );
-    }
-
-    /**
-     * @psalm-param list<AssociationValue> $associationValues
-     * @throws \Exception
-     */
-    protected function associationValuesContains(array $associationValues, AssociationValue $associationValue): bool
-    {
-        foreach ($associationValues as $existingAssociationValue) {
-            if ($existingAssociationValue->equals($associationValue)) {
-                return true;
-            }
-
-            if ($existingAssociationValue->getValue() === $associationValue->getKey()) {
-                throw new \Exception('Assoc values not equal but the same key exists in collection');
-            }
-        }
-
-        return false;
+        ));
     }
 
     /**
@@ -204,7 +208,13 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
             ->setNotnull(true);
         $table->addColumn('association_value', Types::STRING)
             ->setNotnull(true);
-        $table->setPrimaryKey(['saga_id']);
+        $table->setPrimaryKey(['saga_id', 'association_key']);
         $table->addIndex(['saga_type', 'association_key', 'association_value']);
+        $table->addForeignKeyConstraint(
+            $this->dataTableName,
+            ['saga_id', 'saga_type'],
+            ['id', 'type'],
+            ['onDelete' => 'CASCADE'],
+        );
     }
 }

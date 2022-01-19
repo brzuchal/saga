@@ -14,7 +14,7 @@ class PropertyNameEvaluatorTest extends TestCase
         $evaluator = new PropertyNameEvaluator('id');
         $this->assertTrue($evaluator->supports(FooMessage::class, 'id'));
         $message = new FooMessage();
-        $this->assertEquals(123, $evaluator->evaluate($message));
+        $this->assertEquals($message->getId(), $evaluator->evaluate($message));
     }
 
     public function testNotSupported(): void

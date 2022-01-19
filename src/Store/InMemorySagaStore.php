@@ -3,9 +3,7 @@
 namespace Brzuchal\Saga\Store;
 
 use Brzuchal\Saga\Association\AssociationValue;
-use Brzuchal\Saga\Store\SimpleSagaStoreEntry;
-use Brzuchal\Saga\Repository\SagaStore;
-use Brzuchal\Saga\Repository\SagaStoreEntry;
+use Brzuchal\Saga\Association\AssociationValues;
 use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaState;
 
@@ -23,13 +21,11 @@ final class InMemorySagaStore implements SagaStore
 
         $found = [];
         foreach ($this->instances[$type] as $identifier => $instance) {
-            foreach ($instance->associationValues() as $existingAssociationValue) {
-                if (!$existingAssociationValue->equals($associationValue)) {
-                    continue;
-                }
-
-                $found[] = $identifier;
+            if (!$instance->associationValues()->contains($associationValue)) {
+                continue;
             }
+
+            $found[] = $identifier;
         }
 
         return $found;
@@ -56,13 +52,13 @@ final class InMemorySagaStore implements SagaStore
     }
 
     /** @inheritdoc */
-    public function insertSaga(string $type, string $identifier, object $saga, array $associationValues): void
+    public function insertSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues): void
     {
         $this->instances[$type][$identifier] = new SimpleSagaStoreEntry($saga, $associationValues);
     }
 
     /** @inheritdoc */
-    public function updateSaga(string $type, string $identifier, object $saga, array $associationValues, SagaState $state): void
+    public function updateSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues, SagaState $state): void
     {
         $this->instances[$type][$identifier] = new SimpleSagaStoreEntry($saga, $associationValues, $state);
     }

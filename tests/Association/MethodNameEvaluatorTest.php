@@ -14,7 +14,7 @@ class MethodNameEvaluatorTest extends TestCase
         $evaluator = new MethodNameEvaluator('getId');
         $this->assertTrue($evaluator->supports(FooMessage::class, 'id'));
         $message = new FooMessage();
-        $this->assertEquals(123, $evaluator->evaluate($message));
+        $this->assertEquals($message->getId(), $evaluator->evaluate($message));
     }
 
     public function testNotSupported(): void

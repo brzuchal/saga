@@ -2,17 +2,15 @@
 
 namespace Brzuchal\Saga\Store;
 
-use Brzuchal\Saga\Association\AssociationValue;
-use Brzuchal\Saga\Repository\SagaStoreEntry;
+use Brzuchal\Saga\Association\AssociationValues;
 use Brzuchal\Saga\SagaState;
 
 /** @internal  */
 final class SimpleSagaStoreEntry implements SagaStoreEntry
 {
     public function __construct(
-        protected object $saga,
-        /** @psalm-var AssociationValue */
-        protected array $associationValues,
+        protected readonly object $saga,
+        protected readonly AssociationValues $associationValues,
         protected SagaState $state = SagaState::Pending,
     ) {
     }
@@ -22,8 +20,7 @@ final class SimpleSagaStoreEntry implements SagaStoreEntry
         return $this->saga;
     }
 
-    /** @inheritdoc */
-    public function associationValues(): array
+    public function associationValues(): AssociationValues
     {
         return $this->associationValues;
     }
