@@ -23,7 +23,7 @@ class SimpleSagaRepository implements SagaRepository
 
     public function getType(): string
     {
-        return $this->metadata->getType();
+        return $this->metadata->type;
     }
 
     public function supports(object $message): bool
@@ -37,7 +37,7 @@ class SimpleSagaRepository implements SagaRepository
     public function findSagas(object $message): iterable
     {
         return $this->store->findSagas(
-            $this->metadata->getType(),
+            $this->metadata->type,
             $this->metadata->resolveAssociation($message),
         );
     }
@@ -45,7 +45,7 @@ class SimpleSagaRepository implements SagaRepository
     public function loadSaga(string $identifier): SagaInstance
     {
         $entry = $this->store->loadSaga(
-            $this->metadata->getType(),
+            $this->metadata->type,
             $identifier,
         );
 
@@ -81,7 +81,7 @@ class SimpleSagaRepository implements SagaRepository
 
     public function deleteSaga(string $identifier): void
     {
-        $this->store->deleteSaga($this->metadata->getType(), $identifier);
+        $this->store->deleteSaga($this->metadata->type, $identifier);
     }
 
     public function storeSaga(SagaInstance $instance): void
@@ -101,7 +101,7 @@ class SimpleSagaRepository implements SagaRepository
     public function initializationPolicy(object $message): SagaInitializationPolicy
     {
         return new SagaInitializationPolicy(
-            $this->metadata->getCreationPolicy($message),
+            $this->metadata->creationPolicy($message),
             $this->metadata->resolveAssociation($message),
         );
     }

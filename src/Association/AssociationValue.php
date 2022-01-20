@@ -6,23 +6,13 @@ use Stringable;
 
 final class AssociationValue
 {
-    protected string $value;
+    public readonly string $value;
 
     public function __construct(
-        protected string $key,
+        public readonly string $key,
         string|Stringable $value,
     ) {
         $this->value = (string) $value;
-    }
-
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    public function getValue(): string
-    {
-        return $this->value;
     }
 
     public function equals(self $other): bool

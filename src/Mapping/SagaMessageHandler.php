@@ -7,20 +7,20 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD)]
 class SagaMessageHandler
 {
-    public string $key;
+    public readonly string $key;
 
     /**
      * @psalm-param array|null $expressionParameters
      */
     public function __construct(
         string|null $key = null,
-        public string|null $property = null,
-        public string|null $method = null,
-        public string|null $expression = null,
+        public readonly string|null $property = null,
+        public readonly string|null $method = null,
+        public readonly string|null $expression = null,
         /** @psalm-var array|null */
-        public array|null $expressionParameters = [],
+        public readonly array|null $expressionParameters = [],
         /** @psalm-var class-string|null */
-        public string|null $evaluator = null,
+        public readonly string|null $evaluator = null,
     ) {
         if ($this->property === null && $key === null) {
             throw new \RuntimeException(

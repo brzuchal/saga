@@ -16,8 +16,8 @@ use Attribute;
 class SagaStart
 {
     public function __construct(
-        public string|null $dateTimeProperty = null,
-        public bool $forceNew = false,
+        public readonly string|null $dateTimeProperty = null,
+        public readonly bool $forceNew = false,
     ) {
     }
 }

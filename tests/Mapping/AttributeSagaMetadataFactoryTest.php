@@ -13,14 +13,14 @@ class AttributeSagaMetadataFactoryTest extends TestCase
     {
         $factory = new AttributeMappingDriver();
         $metadata = $factory->loadMetadataForClass(AttributedFoo::class);
-        $this->assertEquals(AttributedFoo::class, $metadata->getType());
+        $this->assertEquals(AttributedFoo::class, $metadata->type);
         $message = new FooMessage();
-        $this->assertEquals(AttributedFoo::class, $metadata->getType());
+        $this->assertEquals(AttributedFoo::class, $metadata->type);
         $this->assertTrue($metadata->hasHandlerMethod($message));
         $this->assertEquals('foo', $metadata->findHandlerMethod($message));
         $associationValue = $metadata->resolveAssociation($message);
         $this->assertNotNull($associationValue);
-        $this->assertEquals('keyInt', $associationValue->getKey());
-        $this->assertEquals($message->getId(), $associationValue->getValue());
+        $this->assertEquals('keyInt', $associationValue->key);
+        $this->assertEquals($message->getId(), $associationValue->value);
     }
 }

@@ -8,23 +8,13 @@ use Brzuchal\Saga\SagaCreationPolicy;
 final class SagaMethodMetadata
 {
     public function __construct(
-        protected string $name,
+        public readonly string $name,
         /** @psalm-var list<class-string> */
         protected array $types,
-        protected AssociationResolver $associationResolver,
-        protected SagaCreationPolicy $creationPolicy = SagaCreationPolicy::NONE,
-        protected bool $end = false,
+        public readonly AssociationResolver $associationResolver,
+        public readonly SagaCreationPolicy $creationPolicy = SagaCreationPolicy::NONE,
+        public readonly bool $end = false,
     ) {
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getAssociationResolver(): AssociationResolver
-    {
-        return $this->associationResolver;
     }
 
     /**
@@ -33,15 +23,5 @@ final class SagaMethodMetadata
     public function getTypes(): array
     {
         return $this->types;
-    }
-
-    public function getCreationPolicy(): SagaCreationPolicy
-    {
-        return $this->creationPolicy;
-    }
-
-    public function getEnd(): bool
-    {
-        return $this->end;
     }
 }

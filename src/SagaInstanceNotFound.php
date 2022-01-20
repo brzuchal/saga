@@ -27,8 +27,8 @@ final class SagaInstanceNotFound extends Exception
         return new self(\sprintf(
             'Instance of %s Saga identified by %s=%s',
             $type,
-            $associationValue->getKey(),
-            $associationValue->getValue(),
+            $associationValue->key,
+            $associationValue->value,
         ));
     }
 }
