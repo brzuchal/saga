@@ -12,7 +12,7 @@ final class SagaManagerFactory
     /**
      * @param class-string $type
      */
-    public function getManagerForClass(string $type): SagaManager
+    public function managerForClass(string $type): SagaManager
     {
         return new SagaManager($this->repositoryFactory->create($type));
     }

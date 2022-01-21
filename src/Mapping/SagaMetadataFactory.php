@@ -45,7 +45,7 @@ final class SagaMetadataFactory
                 continue;
             }
 
-            $list[$metadata->getType()] = $metadata;
+            $list[$metadata->type] = $metadata;
         }
 
         return $list;

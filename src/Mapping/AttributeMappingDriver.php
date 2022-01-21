@@ -43,6 +43,7 @@ final class AttributeMappingDriver implements MappingDriver
 
     /**
      * @psalm-return list<SagaMethodMetadata>
+     * @throws IncompleteSagaMetadata
      */
     public function extractMethods(ReflectionClass $class): array
     {
@@ -115,24 +116,24 @@ final class AttributeMappingDriver implements MappingDriver
     {
         $parameter = $method->getParameters()[0];
         if (!$parameter->hasType()) {
-            throw new \UnexpectedValueException('Saga methods require typed first argument');
+            throw new UnexpectedValueException('Saga methods require typed first argument');
         }
         if ($parameter->allowsNull()) {
-            throw new \UnexpectedValueException('Saga methods require non-nullable first argument');
+            throw new UnexpectedValueException('Saga methods require non-nullable first argument');
         }
         if ($parameter->isDefaultValueAvailable()) {
-            throw new \UnexpectedValueException('Saga method first argument default value is forbidden');
+            throw new UnexpectedValueException('Saga method first argument default value is forbidden');
         }
         $parameterType = $parameter->getType();
         if ($parameterType === null) {
             throw new UnexpectedValueException('Saga method first argument type is required');
         }
         if ($parameterType instanceof ReflectionIntersectionType) {
-            throw new \UnexpectedValueException('Saga method first argument type cannot be intersection type');
+            throw new UnexpectedValueException('Saga method first argument type cannot be intersection type');
         }
         if ($parameterType instanceof ReflectionNamedType) {
             if ($parameterType->isBuiltin()) {
-                throw new \UnexpectedValueException('Saga method first argument type cannot be built-in');
+                throw new UnexpectedValueException('Saga method first argument type cannot be built-in');
             }
             $type = $parameterType->getName();
             \assert(\class_exists($type));
@@ -143,10 +144,10 @@ final class AttributeMappingDriver implements MappingDriver
         if ($parameterType->getTypes()) {
             foreach ($parameterType->getTypes() as $type) {
                 if ($type->isBuiltin()) {
-                    throw new \UnexpectedValueException('Saga method first argument type cannot include built-in types');
+                    throw new UnexpectedValueException('Saga method first argument type cannot include built-in types');
                 }
                 if ($type->allowsNull()) {
-                    throw new \UnexpectedValueException('Saga methods first argument type cannot include null type');
+                    throw new UnexpectedValueException('Saga methods first argument type cannot include null type');
                 }
                 $type = $type->getName();
                 \assert(\class_exists($type));

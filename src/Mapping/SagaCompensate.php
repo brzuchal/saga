@@ -8,7 +8,7 @@ use Attribute;
 class SagaCompensate
 {
     public function __construct(
-        public string $action
+        public readonly string $action
     ) {
     }
 }

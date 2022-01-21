@@ -29,8 +29,8 @@ class SagaMetadataTest extends TestCase
         );
         $message = new FooMessage();
         $associationValue = $metadata->resolveAssociation($message);
-        $this->assertEquals($message->getId(), $associationValue->getValue());
-        $this->assertEquals('fooId', $associationValue->getKey());
+        $this->assertEquals('fooId', $associationValue->key);
+        $this->assertEquals($message->getId(), $associationValue->value);
     }
 
     public function testMultiMethodAssociationValueEvaluation(): void
@@ -52,7 +52,7 @@ class SagaMetadataTest extends TestCase
         );
         $message = new FooMessage();
         $associationValue = $metadata->resolveAssociation($message);
-        $this->assertEquals($message->getId(), $associationValue->getValue());
-        $this->assertEquals('fooId', $associationValue->getKey());
+        $this->assertEquals('fooId', $associationValue->key);
+        $this->assertEquals($message->getId(), $associationValue->value);
     }
 }

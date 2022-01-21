@@ -33,8 +33,8 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
             "SELECT saga_id FROM {$this->assocTableName} WHERE association_key = ? AND association_value = ? AND saga_type = ?"
             )
             ->executeQuery([
-                $associationValue->getKey(),
-                $associationValue->getValue(),
+                $associationValue->key,
+                $associationValue->value,
                 $type,
             ])
             ->fetchFirstColumn();
@@ -101,8 +101,8 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                 ->insert($this->assocTableName, [
                     'saga_id' => $identifier,
                     'saga_type' => $type,
-                    'association_key' => $associationValue->getKey(),
-                    'association_value' => $associationValue->getValue(),
+                    'association_key' => $associationValue->key,
+                    'association_value' => $associationValue->value,
             ]);
         }
         $this->connection->commit();
@@ -128,8 +128,8 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                 ->insert($this->assocTableName, [
                     'saga_id' => $identifier,
                     'saga_type' => $type,
-                    'association_key' => $associationValue->getKey(),
-                    'association_value' => $associationValue->getValue(),
+                    'association_key' => $associationValue->key,
+                    'association_value' => $associationValue->value,
                 ]);
         }
         foreach ($associationValues->removedAssociations() as $associationValue) {
@@ -137,8 +137,8 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                 ->delete($this->assocTableName, [
                     'saga_id' => $identifier,
                     'saga_type' => $type,
-                    'association_key' => $associationValue->getKey(),
-                    'association_value' => $associationValue->getValue(),
+                    'association_key' => $associationValue->key,
+                    'association_value' => $associationValue->value,
                 ]);
         }
         $this->connection->commit();

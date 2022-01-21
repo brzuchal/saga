@@ -8,6 +8,7 @@ interface SagaRepository
 {
     /**
      * @return class-string
+     * TODO: investigate on ways to remove this method
      */
     public function getType(): string;
 

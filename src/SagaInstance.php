@@ -23,10 +23,10 @@ final class SagaInstance
      */
     public function getType(): string
     {
-        return $this->metadata->getType();
+        return $this->metadata->type;
     }
 
-    public function getLifecycle(): SagaLifecycle
+    public function lifecycle(): SagaLifecycle
     {
         return new SagaLifecycle(
             $this->state,
@@ -55,7 +55,7 @@ final class SagaInstance
     public function handle(object $message): void
     {
         $method = $this->metadata->findHandlerMethod($message);
-        $lifecycle = $this->getLifecycle();
+        $lifecycle = $this->lifecycle();
         try {
             $this->instance->{$method}($message, $lifecycle);
             if ($this->metadata->isCompleting($message)) {
