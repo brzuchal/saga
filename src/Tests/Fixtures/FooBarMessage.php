@@ -4,9 +4,9 @@ namespace Brzuchal\Saga\Tests\Fixtures;
 
 class FooBarMessage
 {
-    public int $id = 456;
+    public string $id = 'f10905bd-b805-45d1-8d43-3c4cb782e9f3';
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

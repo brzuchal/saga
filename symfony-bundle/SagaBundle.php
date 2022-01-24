@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Bundle;
+namespace Brzuchal\SagaBundle;
 
-use Brzuchal\Saga\Bundle\DependencyInjection\SagaExtension;
+use Brzuchal\SagaBundle\DependencyInjection\SagaExtension;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

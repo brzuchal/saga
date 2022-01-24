@@ -9,7 +9,6 @@ use Brzuchal\Saga\Association\PropertyNameEvaluator;
 use Brzuchal\Saga\Mapping\SagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMethodMetadata;
 use Brzuchal\Saga\Repository\SimpleSagaRepository;
-use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaInstance;
 use Brzuchal\Saga\SagaState;
 use Brzuchal\Saga\Store\SagaStore;

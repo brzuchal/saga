@@ -7,9 +7,9 @@ final class SagaMetadataFactory
     /** @psalm-var array<class-string, SagaMetadata> */
     protected array $data = [];
 
-    /** @psalm-param array<class-string, MappingDriver> $drivers */
+    /** @psalm-param iterable<class-string, MappingDriver> $drivers */
     public function __construct(
-        protected array $drivers = [],
+        protected iterable $drivers = [],
     ) {
     }
 

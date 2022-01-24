@@ -16,7 +16,7 @@ use Brzuchal\Saga\SagaManager;
 use Brzuchal\Saga\Store\InMemorySagaStore;
 use Brzuchal\Saga\SagaRejected;
 use Brzuchal\Saga\SagaRepository;
-use Brzuchal\Saga\SagaRepositoryFactory;
+use Brzuchal\Saga\Repository\SimpleSagaRepositoryFactory;
 use Brzuchal\Saga\SagaState;
 use Brzuchal\Saga\Tests\Fixtures\BarMessage;
 use Brzuchal\Saga\Tests\Fixtures\BazMessage;
@@ -35,7 +35,7 @@ class SagaManagerTest extends TestCase
     protected function setUp(): void
     {
         $this->store = new InMemorySagaStore();
-        $repositoryFactory = new SagaRepositoryFactory(
+        $repositoryFactory = new SimpleSagaRepositoryFactory(
             $this->store,
             new SagaMetadataFactory([
                 new class() implements MappingDriver {

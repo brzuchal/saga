@@ -8,8 +8,10 @@
 >
     <projectFiles>
         <directory name="src" />
+        <directory name="symfony-bundle" />
         <ignoreFiles>
-            <directory name="tests" />
+            <directory name="src/Tests" />
+            <directory name="symfony-bundle/Tests" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

@@ -13,7 +13,7 @@ use Brzuchal\Saga\SagaInstance;
 use Brzuchal\Saga\SagaRepository;
 use Brzuchal\Saga\Store\SagaStore;
 
-class SimpleSagaRepository implements SagaRepository
+final class SimpleSagaRepository implements SagaRepository
 {
     public function __construct(
         protected SagaStore $store,

@@ -1,6 +1,6 @@
 <?php
 
-namespace Association;
+namespace Brzuchal\Saga\Tests\Association;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Association\AssociationValues;

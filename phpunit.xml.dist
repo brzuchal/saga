@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
          colors="true">
     <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">src</directory>
+            <directory suffix=".php">symfony/bundle</directory>
         </include>
     </coverage>
     <testsuites>
-        <testsuite name="Tests">
-            <directory>tests</directory>
+        <testsuite name="Saga">
+            <directory>src/Tests</directory>
+        </testsuite>
+        <testsuite name="SagaBundle">
+            <directory>symfony-bundle/Tests</directory>
         </testsuite>
     </testsuites>
     <php>

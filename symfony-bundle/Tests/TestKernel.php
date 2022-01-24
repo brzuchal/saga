@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Brzuchal\Saga\Tests\Bundle;
+namespace Brzuchal\SagaBundle\Tests;
 
-use Brzuchal\Saga\Bundle\SagaBundle;
+use Brzuchal\Saga\Tests\Fixtures\AttributedFoo;
+use Brzuchal\SagaBundle\SagaBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -55,10 +56,21 @@ final class TestKernel extends Kernel implements CompilerPassInterface
             'secret' => 'nope',
             'test' => true,
             'messenger' => null,
-            'serializer' => null,
+            'serializer' => ['enabled' => false],
         ]);
 
-        // TODO: add bundle config here
+        $container->loadFromExtension('brzuchal_saga', [
+            'stores' => [
+                'default' => [
+                    'driver' => 'doctrine',
+                ],
+            ],
+            'mappings' => [
+                AttributedFoo::class => [
+                    'type' => 'attributes',
+                ],
+            ],
+        ]);
     }
 
     public function process(ContainerBuilder $container)
