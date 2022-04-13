@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Tests\Fixtures;
 
@@ -8,7 +10,7 @@ class BarMessage
 {
     public function __construct(
         public readonly string $bar = 'bar',
-        public readonly Exception|null $exception = null,
+        public readonly \Throwable|null $exception = null,
     ) {
     }
 }

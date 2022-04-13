@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Tests\Fixtures;
 
@@ -11,11 +13,11 @@ use Brzuchal\Saga\SagaLifecycle;
 #[Saga]
 class AttributedFoo
 {
-    public ?int $foo = null;
+    public ?string $foo = null;
     public bool $fooInvoked = false;
     public ?string $bar = null;
     public bool $barInvoked = false;
-    public ?array $baz = null;
+    public ?string $baz = null;
     public bool $bazInvoked = false;
 
     #[SagaStart,SagaMessageHandler(key: 'keyInt', property: 'id')]
@@ -35,7 +37,7 @@ class AttributedFoo
     #[SagaEnd,SagaMessageHandler(key: 'keyInt', property: 'id')]
     public function baz(BazMessage $message, SagaLifecycle $lifecycle): void
     {
-        $this->baz = $message->baz;
+        $this->baz = $message->id;
         $this->bazInvoked = true;
     }
 }

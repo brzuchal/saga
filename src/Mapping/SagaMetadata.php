@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Mapping;
 
@@ -8,11 +10,13 @@ use Closure;
 
 final class SagaMetadata
 {
+    /**
+     * @psalm-param class-string $type
+     * @psalm-param list<SagaMethodMetadata> $methods
+     */
     public function __construct(
-        /** @psalm-var class-string */
         public readonly string $type,
         protected readonly Closure $factory,
-        /** @psalm-var list<SagaMethodMetadata> */
         protected array $methods,
     ) {
     }
@@ -27,7 +31,7 @@ final class SagaMetadata
      */
     public function resolveAssociation(object $message): AssociationValue
     {
-        $class = \get_class($message);
+        $class = $message::class;
         $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
             throw IncompleteSagaMetadata::unsupportedMessageType($this->type, $class);
@@ -46,7 +50,7 @@ final class SagaMetadata
      */
     public function findHandlerMethod(object $message): string
     {
-        $class = \get_class($message);
+        $class = $message::class;
         $methodMetadata = $this->findForArgumentType($class);
         if ($methodMetadata === null) {
             throw IncompleteSagaMetadata::unsupportedMessageType($this->type, $class);
@@ -57,7 +61,7 @@ final class SagaMetadata
 
     public function hasHandlerMethod(object $message): bool
     {
-        return $this->findForArgumentType(\get_class($message)) !== null;
+        return $this->findForArgumentType($message::class) !== null;
     }
 
     /**
@@ -66,7 +70,7 @@ final class SagaMetadata
     protected function findForArgumentType(string $class): SagaMethodMetadata|null
     {
         foreach ($this->methods as $method) {
-            if (!\in_array($class, $method->getTypes(), true)) {
+            if (! \in_array($class, $method->getTypes(), true)) {
                 continue;
             }
 
@@ -81,7 +85,7 @@ final class SagaMetadata
      */
     public function creationPolicy(object $message): SagaCreationPolicy
     {
-        $messageType = \get_class($message);
+        $messageType = $message::class;
         $metadata = $this->findForArgumentType($messageType);
         if ($metadata === null) {
             throw IncompleteSagaMetadata::unsupportedMessageType($this->type, $messageType);
@@ -95,7 +99,7 @@ final class SagaMetadata
      */
     public function isCompleting(object $message): bool
     {
-        $messageType = \get_class($message);
+        $messageType = $message::class;
         $metadata = $this->findForArgumentType($messageType);
         if ($metadata === null) {
             throw IncompleteSagaMetadata::unsupportedMessageType($this->type, $messageType);

@@ -1,6 +1,8 @@
 <?php
 
-namespace Association;
+declare(strict_types=1);
+
+namespace Brzuchal\Saga\Tests\Association;
 
 use Brzuchal\Saga\Association\AssociationValue;
 use Brzuchal\Saga\Association\AssociationValues;
@@ -40,7 +42,8 @@ class AssociationValuesTest extends TestCase
     {
         $associationValue = new AssociationValue('id', '1771d827-61ad-439c-b627-34ca6b0e8a98');
         $associationValues = new AssociationValues([$associationValue]);
-        $this->assertFalse($associationValues->contains(new AssociationValue('id', '5f42b8e8-2969-4efb-8b47-1dec558e5702')));
+        $wrongAssociationValue = new AssociationValue('id', '5f42b8e8-2969-4efb-8b47-1dec558e5702');
+        $this->assertFalse($associationValues->contains($wrongAssociationValue));
     }
 
     public function testAddAndRemove(): void

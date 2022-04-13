@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Association;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Stringable;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 final class ExpressionLanguageEvaluator implements AssociationEvaluator
 {

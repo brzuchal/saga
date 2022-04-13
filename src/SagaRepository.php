@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -20,7 +22,7 @@ interface SagaRepository
     public function findSagas(object $message): iterable;
 
     /**
-     * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store
+     * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store.
      */
     public function loadSaga(string $identifier): SagaInstance;
 

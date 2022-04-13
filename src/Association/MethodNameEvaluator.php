@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Association;
 
@@ -21,7 +23,7 @@ final class MethodNameEvaluator implements AssociationEvaluator
         throw new RuntimeException(\sprintf(
             'Unable to evaluate method %s on %s',
             $this->methodName,
-            \get_class($object)
+            $object::class
         ));
     }
 

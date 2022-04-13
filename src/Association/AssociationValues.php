@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Association;
 
@@ -21,7 +23,8 @@ final class AssociationValues implements IteratorAggregate, Countable
     public function __construct(
         /** @psalm-var list<AssociationValue> */
         protected array $values,
-    ) {}
+    ) {
+    }
 
     public function contains(AssociationValue $associationValue): bool
     {
@@ -38,7 +41,7 @@ final class AssociationValues implements IteratorAggregate, Countable
         if ($this->arrayContains($this->removedValues, $associationValue)) {
             $this->removedValues = \array_values(\array_filter(
                 $this->removedValues,
-                static fn (AssociationValue $existingAssociationValue) => !$existingAssociationValue->equals($associationValue),
+                static fn (AssociationValue $existing) => ! $existing->equals($associationValue),
             ));
         } else {
             $this->addedValues[] = $associationValue;
@@ -49,19 +52,19 @@ final class AssociationValues implements IteratorAggregate, Countable
 
     public function remove(AssociationValue $associationValue): bool
     {
-        if (!$this->contains($associationValue)) {
+        if (! $this->contains($associationValue)) {
             return false;
         }
 
         $this->values = \array_values(\array_filter(
             $this->values,
-            static fn (AssociationValue $existingAssociationValue) => !$existingAssociationValue->equals($associationValue),
+            static fn (AssociationValue $existing) => ! $existing->equals($associationValue),
         ));
 
         if ($this->arrayContains($this->addedValues, $associationValue)) {
             $this->addedValues = \array_values(\array_filter(
                 $this->addedValues,
-                static fn (AssociationValue $existingAssociationValue) => !$existingAssociationValue->equals($associationValue),
+                static fn (AssociationValue $existing) => ! $existing->equals($associationValue),
             ));
         } else {
             $this->removedValues[] = $associationValue;
@@ -82,15 +85,21 @@ final class AssociationValues implements IteratorAggregate, Countable
         return $this->addedValues;
     }
 
+    /**
+     * @psalm-return Traversable<array-key, AssociationValue>
+     */
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->values);
     }
 
+    /**
+     * @psalm-param list<AssociationValue> $values
+     */
     protected function arrayContains(array $values, AssociationValue $associationValue): bool
     {
         foreach ($values as $existingAssociationValue) {
-            if (!$existingAssociationValue->equals($associationValue)) {
+            if (! $existingAssociationValue->equals($associationValue)) {
                 continue;
             }
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -6,7 +8,6 @@ use Brzuchal\Saga\Association\AssociationValue;
 
 /**
  * Based on SagaInitializationPolicy from AxonFramework
- * @author Allard Buijze
  */
 
 /**
@@ -18,8 +19,8 @@ final class SagaInitializationPolicy
     /**
      * Creates an instance using the given {@see self::creationPolicy()} and {@see self::initialAssociationValue()}.
      *
-     * @param SagaCreationPolicy $creationPolicy             The policy describing the condition to loadMetadataForClass a new instance
-     * @param AssociationValue $initialAssociationValue The association value a new Saga instance should be given
+     * @param SagaCreationPolicy $creationPolicy          The policy describing the condition to loadMetadataForClass
+     * @param AssociationValue   $initialAssociationValue The association value a new Saga instance should be given
      */
     public function __construct(
         protected SagaCreationPolicy $creationPolicy,

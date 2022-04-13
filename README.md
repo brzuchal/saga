@@ -34,11 +34,11 @@ use App\OrderProcessing;
 use App\Events\OrderCreated;
 use Brzuchal\Saga\Mapping\AttributeMappingDriver;
 use Brzuchal\Saga\Mapping\SagaMetadataFactory;
-use Brzuchal\Saga\SagaRepositoryFactory;
+use Brzuchal\Saga\Repository\SimpleSagaRepositoryFactory;
 use Brzuchal\Saga\SagaManager;
 use Brzuchal\Saga\Store\InMemorySagaStore;
 
-$repositoryFactory = new SagaRepositoryFactory(
+$repositoryFactory = new SimpleSagaRepositoryFactory(
     new InMemorySagaStore(), 
     new SagaMetadataFactory([new AttributeMappingDriver()]),
 );

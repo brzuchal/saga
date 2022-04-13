@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -27,9 +29,10 @@ final class SagaLifecycle
     /**
      * @throws SagaRejected
      */
-    public function reject(Exception $exception = null): void
+    public function reject(?\Throwable $exception = null): void
     {
         $this->state = SagaState::Rejected;
+
         throw SagaRejected::create($exception);
     }
 

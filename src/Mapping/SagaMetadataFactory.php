@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Mapping;
 
@@ -7,9 +9,9 @@ final class SagaMetadataFactory
     /** @psalm-var array<class-string, SagaMetadata> */
     protected array $data = [];
 
-    /** @psalm-param array<class-string, MappingDriver> $drivers */
+    /** @psalm-param iterable<class-string, MappingDriver> $drivers */
     public function __construct(
-        protected array $drivers = [],
+        protected iterable $drivers = [],
     ) {
     }
 
@@ -41,7 +43,7 @@ final class SagaMetadataFactory
     {
         $list = [];
         foreach ($this->data as $metadata) {
-            if (!$metadata->hasHandlerMethod($message)) {
+            if (! $metadata->hasHandlerMethod($message)) {
                 continue;
             }
 

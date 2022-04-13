@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Tests\Association;
 
-use Brzuchal\Saga\Association\PropertyNameEvaluator;
+use Brzuchal\Saga\Association\MethodNameEvaluator;
 use Brzuchal\Saga\Tests\Fixtures\FooMessage;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-class PropertyNameEvaluatorTest extends TestCase
+class MethodNameEvaluatorTest extends TestCase
 {
     public function testEvaluation(): void
     {
-        $evaluator = new PropertyNameEvaluator('id');
+        $evaluator = new MethodNameEvaluator('getId');
         $this->assertTrue($evaluator->supports(FooMessage::class, 'id'));
         $message = new FooMessage();
         $this->assertEquals($message->getId(), $evaluator->evaluate($message));
@@ -19,13 +21,13 @@ class PropertyNameEvaluatorTest extends TestCase
 
     public function testNotSupported(): void
     {
-        $evaluator = new PropertyNameEvaluator('nonExistent');
-        $this->assertFalse($evaluator->supports(FooMessage::class, 'nonExistent'));
+        $evaluator = new MethodNameEvaluator('getNonexistentMethod');
+        $this->assertFalse($evaluator->supports(FooMessage::class, 'id'));
     }
 
     public function testFailOnNonExistentMethod(): void
     {
-        $evaluator = new PropertyNameEvaluator('nonexistent');
+        $evaluator = new MethodNameEvaluator('getNonexistentMethod');
         $this->expectException(RuntimeException::class);
         $evaluator->evaluate(new FooMessage());
     }
