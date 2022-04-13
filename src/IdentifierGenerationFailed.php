@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -6,7 +8,7 @@ use Exception;
 
 final class IdentifierGenerationFailed extends Exception
 {
-    public static function forAlgoAndException(string $algo, Exception $exception): self
+    public static function forAlgoAndException(string $algo, \Throwable $exception): self
     {
         return new self(\sprintf(
             'Unable to generate identifier using hash algo %s',

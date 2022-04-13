@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -24,7 +26,7 @@ final class SagaManager
      */
     public function __invoke(object $message): void
     {
-        if (!$this->repository->supports($message)) {
+        if (! $this->repository->supports($message)) {
             return;
         }
 
@@ -51,7 +53,7 @@ final class SagaManager
      */
     protected function doInvokeSaga(SagaInstance $instance, object $message): void
     {
-        if (!$instance->canHandle($message)) {
+        if (! $instance->canHandle($message)) {
             return;
         }
 
@@ -79,10 +81,6 @@ final class SagaManager
             return true;
         }
 
-        if ($initializationPolicy->createIfNoneFound() && $nonInvokedSaga === true) {
-            return true;
-        }
-
-        return false;
+        return $initializationPolicy->createIfNoneFound() && $nonInvokedSaga === true;
     }
 }

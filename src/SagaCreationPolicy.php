@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -10,15 +12,15 @@ enum SagaCreationPolicy
     /**
      * Never loadMetadataForClass a new Saga instance, even if none exists.
      */
-    case NONE;
+case NONE;
 
     /**
      * Only loadMetadataForClass a new Saga instance if none can be found.
      */
-    case IF_NONE_FOUND;
+case IF_NONE_FOUND;
 
     /**
      * Always loadMetadataForClass a new Saga, even if one already exists.
      */
-    case ALWAYS;
-}
+case ALWAYS;
+    }

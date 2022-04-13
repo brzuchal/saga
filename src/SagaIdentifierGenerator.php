@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -13,7 +15,7 @@ class SagaIdentifierGenerator
     {
         try {
             return \hash('sha256', \random_bytes(1024));
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             throw IdentifierGenerationFailed::forAlgoAndException('sha256', $exception);
         }
     }

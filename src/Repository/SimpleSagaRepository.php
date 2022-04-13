@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Repository;
 
@@ -13,13 +15,14 @@ use Brzuchal\Saga\SagaInstance;
 use Brzuchal\Saga\SagaRepository;
 use Brzuchal\Saga\Store\SagaStore;
 
-class SimpleSagaRepository implements SagaRepository
+final class SimpleSagaRepository implements SagaRepository
 {
     public function __construct(
         protected SagaStore $store,
         protected SagaMetadata $metadata,
         protected SagaIdentifierGenerator $identifierGenerator = new SagaIdentifierGenerator(),
-    ) {}
+    ) {
+    }
 
     public function getType(): string
     {
@@ -33,6 +36,8 @@ class SimpleSagaRepository implements SagaRepository
 
     /**
      * @throws IncompleteSagaMetadata
+     *
+     * @inheritdoc
      */
     public function findSagas(object $message): iterable
     {

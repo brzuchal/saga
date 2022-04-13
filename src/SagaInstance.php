@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga;
 
@@ -63,7 +65,7 @@ final class SagaInstance
             }
         } catch (SagaRejected $exception) {
             throw $exception;
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             $lifecycle->reject($exception);
         } finally {
             $this->state = $lifecycle->getState();

@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Tests\Fixtures;
 
-class FooBar extends Foo
+class FooSagaBar extends FooSaga
 {
     public function fooBar(FooBarMessage $message): void
     {

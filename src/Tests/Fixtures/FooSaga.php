@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Tests\Fixtures;
 
 use Brzuchal\Saga\SagaLifecycle;
 
-class Foo
+class FooSaga
 {
     public bool $fooInvoked = false;
     public bool $barInvoked = false;

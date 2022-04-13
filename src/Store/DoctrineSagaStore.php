@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Store;
 
@@ -12,6 +14,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Types;
 
+use function sprintf;
+
 final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
 {
     public const DEFAULT_ASSOC_TABLE_NAME = 'saga_assoc';
@@ -21,17 +25,21 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
         protected Connection $connection,
         protected string $assocTableName = self::DEFAULT_ASSOC_TABLE_NAME,
         protected string $dataTableName = self::DEFAULT_DATA_TABLE_NAME,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws Exception
+     *
+     * @inheritdoc
      */
     public function findSagas(string $type, AssociationValue $associationValue): iterable
     {
         return $this->connection
-            ->prepare(
-            "SELECT saga_id FROM {$this->assocTableName} WHERE association_key = ? AND association_value = ? AND saga_type = ?"
-            )
+            ->prepare(sprintf(
+                'SELECT saga_id FROM %s WHERE association_key = ? AND association_value = ? AND saga_type = ?',
+                $this->assocTableName,
+            ))
             ->executeQuery([
                 $associationValue->key,
                 $associationValue->value,
@@ -47,7 +55,10 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     public function loadSaga(string $type, string $identifier): SagaStoreEntry
     {
         $entry = $this->connection
-            ->prepare("SELECT serialized, type, state FROM {$this->dataTableName} WHERE id = ?")
+            ->prepare(sprintf(
+                'SELECT serialized, type, state FROM %s WHERE id = ?',
+                $this->dataTableName,
+            ))
             ->executeQuery([$identifier])
             ->fetchAssociative();
 
@@ -82,11 +93,16 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     }
 
     /**
-     * @inheritdoc
      * @throws Exception
+     *
+     * @inheritdoc
      */
-    public function insertSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues): void
-    {
+    public function insertSaga(
+        string $type,
+        string $identifier,
+        object $saga,
+        AssociationValues $associationValues,
+    ): void {
         $this->connection->beginTransaction();
         $this->connection
             ->insert($this->dataTableName, [
@@ -103,21 +119,27 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                     'saga_type' => $type,
                     'association_key' => $associationValue->key,
                     'association_value' => $associationValue->value,
-            ]);
+                ]);
         }
+
         $this->connection->commit();
     }
 
     /**
      * @throws Exception
      */
-    public function updateSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues, SagaState $state): void
-    {
+    public function updateSaga(
+        string $type,
+        string $identifier,
+        object $saga,
+        AssociationValues $associationValues,
+        SagaState $state,
+    ): void {
         $this->connection->beginTransaction();
         $this->connection
             ->update($this->dataTableName, [
                 'serialized' => \serialize($saga),
-                'state' => $state->value
+                'state' => $state->value,
             ], [
                 'id' => $identifier,
                 'type' => $type,
@@ -132,6 +154,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                     'association_value' => $associationValue->value,
                 ]);
         }
+
         foreach ($associationValues->removedAssociations() as $associationValue) {
             $this->connection
                 ->delete($this->assocTableName, [
@@ -141,6 +164,7 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
                     'association_value' => $associationValue->value,
                 ]);
         }
+
         $this->connection->commit();
     }
 
@@ -150,7 +174,10 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     protected function readAssociationValues(string $identifier): AssociationValues
     {
         $assocList = $this->connection
-            ->prepare("SELECT association_key, association_value FROM {$this->assocTableName} WHERE saga_id = ?")
+            ->prepare(sprintf(
+                'SELECT association_key, association_value FROM %s WHERE saga_id = ?',
+                $this->assocTableName,
+            ))
             ->executeQuery([$identifier])
             ->fetchAllAssociative();
 

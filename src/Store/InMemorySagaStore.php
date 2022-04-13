@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Store;
 
@@ -15,13 +17,13 @@ final class InMemorySagaStore implements SagaStore
     /** @inheritdoc */
     public function findSagas(string $type, AssociationValue $associationValue): array
     {
-        if (!\array_key_exists($type, $this->instances)) {
+        if (! \array_key_exists($type, $this->instances)) {
             return [];
         }
 
         $found = [];
         foreach ($this->instances[$type] as $identifier => $instance) {
-            if (!$instance->associationValues()->contains($associationValue)) {
+            if (! $instance->associationValues()->contains($associationValue)) {
                 continue;
             }
 
@@ -31,35 +33,40 @@ final class InMemorySagaStore implements SagaStore
         return $found;
     }
 
-    /** @inheritdoc */
     public function loadSaga(string $type, string $identifier): SagaStoreEntry
     {
-        if (!\array_key_exists($type, $this->instances)) {
+        if (! \array_key_exists($type, $this->instances)) {
             throw SagaInstanceNotFound::unableToLoad($type, $identifier);
         }
 
-        if (!\array_key_exists($identifier, $this->instances[$type])) {
+        if (! \array_key_exists($identifier, $this->instances[$type])) {
             throw SagaInstanceNotFound::unableToLoad($type, $identifier);
         }
 
         return $this->instances[$type][$identifier];
     }
 
-    /** @inheritdoc */
     public function deleteSaga(string $type, string $identifier): void
     {
         unset($this->instances[$type][$identifier]);
     }
 
-    /** @inheritdoc */
-    public function insertSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues): void
-    {
+    public function insertSaga(
+        string $type,
+        string $identifier,
+        object $saga,
+        AssociationValues $associationValues,
+    ): void {
         $this->instances[$type][$identifier] = new SimpleSagaStoreEntry($saga, $associationValues);
     }
 
-    /** @inheritdoc */
-    public function updateSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues, SagaState $state): void
-    {
+    public function updateSaga(
+        string $type,
+        string $identifier,
+        object $saga,
+        AssociationValues $associationValues,
+        SagaState $state,
+    ): void {
         $this->instances[$type][$identifier] = new SimpleSagaStoreEntry($saga, $associationValues, $state);
     }
 }
