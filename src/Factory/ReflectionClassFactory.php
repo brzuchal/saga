@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Factory;
 
@@ -14,6 +16,7 @@ final class ReflectionClassFactory
 
     /**
      * @param class-string<T> $type
+     *
      * @throws ReflectionException
      */
     public function __construct(
@@ -24,6 +27,7 @@ final class ReflectionClassFactory
 
     /**
      * @psalm-return T
+     *
      * @throws ReflectionException
      */
     public function __invoke(): callable

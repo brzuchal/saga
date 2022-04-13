@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brzuchal\Saga\Tests;
 
 use Brzuchal\Saga\Association\AssociationValue;
@@ -39,6 +41,7 @@ class SagaLifecycleTest extends TestCase
         } catch (SagaRejected $exception) {
             $this->assertInstanceOf(RuntimeException::class, $exception->getPrevious());
         }
+
         $this->assertSame(SagaState::Rejected, $lifecycle->getState());
         $this->assertFalse($lifecycle->isActive());
     }

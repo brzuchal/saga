@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Repository;
 
@@ -14,7 +16,8 @@ final class SimpleSagaRepositoryFactory implements SagaRepositoryFactory
         protected SagaStore $store,
         protected SagaMetadataFactory $metadataFactory,
         protected SagaIdentifierGenerator $identifierGenerator = new SagaIdentifierGenerator(),
-    ) {}
+    ) {
+    }
 
     /**
      * @param class-string $type

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Mapping;
 
@@ -41,7 +43,7 @@ final class SagaMetadataFactory
     {
         $list = [];
         foreach ($this->data as $metadata) {
-            if (!$metadata->hasHandlerMethod($message)) {
+            if (! $metadata->hasHandlerMethod($message)) {
                 continue;
             }
 

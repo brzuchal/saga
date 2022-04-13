@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Association;
 
@@ -12,10 +14,10 @@ final class AssociationResolver
 
     public function resolve(object $message): AssociationValue|null
     {
-        if (!$this->associationEvaluator->supports(\get_class($message), $this->key)) {
+        if (! $this->associationEvaluator->supports($message::class, $this->key)) {
             throw new \UnexpectedValueException(\sprintf(
                 'Class %s is not supported by given association evaluator',
-                \get_class($message),
+                $message::class,
             ));
         }
 

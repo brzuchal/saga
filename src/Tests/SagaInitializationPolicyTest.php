@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brzuchal\Saga\Tests;
 
 use Brzuchal\Saga\Association\AssociationValue;

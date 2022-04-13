@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Repository;
 
@@ -16,7 +18,8 @@ final class MappedRepositoryFactory implements SagaRepositoryFactory
         protected iterable $stores,
         protected SagaMetadataFactory $metadataFactory,
         protected SagaIdentifierGenerator $identifierGenerator = new SagaIdentifierGenerator(),
-    ) {}
+    ) {
+    }
 
     public function create(string $type): SagaRepository
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brzuchal\Saga\Tests;
 
 use Brzuchal\Saga\Association\AssociationResolver;
@@ -9,19 +11,19 @@ use Brzuchal\Saga\Mapping\MappingDriver;
 use Brzuchal\Saga\Mapping\SagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMetadataFactory;
 use Brzuchal\Saga\Mapping\SagaMethodMetadata;
+use Brzuchal\Saga\Repository\SimpleSagaRepositoryFactory;
 use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaIdentifierGenerator;
 use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaManager;
-use Brzuchal\Saga\Store\InMemorySagaStore;
 use Brzuchal\Saga\SagaRejected;
 use Brzuchal\Saga\SagaRepository;
-use Brzuchal\Saga\Repository\SimpleSagaRepositoryFactory;
 use Brzuchal\Saga\SagaState;
+use Brzuchal\Saga\Store\InMemorySagaStore;
 use Brzuchal\Saga\Tests\Fixtures\BarMessage;
 use Brzuchal\Saga\Tests\Fixtures\BazMessage;
-use Brzuchal\Saga\Tests\Fixtures\Foo;
 use Brzuchal\Saga\Tests\Fixtures\FooMessage;
+use Brzuchal\Saga\Tests\Fixtures\FooSaga;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -38,12 +40,12 @@ class SagaManagerTest extends TestCase
         $repositoryFactory = new SimpleSagaRepositoryFactory(
             $this->store,
             new SagaMetadataFactory([
-                new class() implements MappingDriver {
+                new class () implements MappingDriver {
                     public function loadMetadataForClass(string $class): SagaMetadata|null
                     {
                         return new SagaMetadata(
-                            Foo::class,
-                            fn () => new Foo(),
+                            FooSaga::class,
+                            static fn () => new FooSaga(),
                             [
                                 new SagaMethodMetadata(
                                     'foo',
@@ -67,9 +69,10 @@ class SagaManagerTest extends TestCase
                     }
                 },
             ]),
-            new class(self::IDENTIFIER) extends SagaIdentifierGenerator {
+            new class (self::IDENTIFIER) extends SagaIdentifierGenerator {
                 public function __construct(protected string $identifier)
-                {}
+                {
+                }
 
                 public function generateIdentifier(): string
                 {
@@ -77,7 +80,7 @@ class SagaManagerTest extends TestCase
                 }
             }
         );
-        $this->repository = $repositoryFactory->create(Foo::class);
+        $this->repository = $repositoryFactory->create(FooSaga::class);
     }
 
     public function testInstanceCreation(): void
@@ -87,13 +90,13 @@ class SagaManagerTest extends TestCase
         $manager(new FooMessage($id));
 
         $identifiers = $this->store->findSagas(
-            Foo::class,
+            FooSaga::class,
             new AssociationValue('id', $id),
         );
         $this->assertNotEmpty($identifiers);
         $entry = $this->repository->loadSaga($identifiers[0]);
-        $this->assertInstanceOf(Foo::class, $entry->instance);
-        \assert($entry->instance instanceof Foo);
+        $this->assertInstanceOf(FooSaga::class, $entry->instance);
+        \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->fooInvoked);
     }
 
@@ -106,14 +109,14 @@ class SagaManagerTest extends TestCase
         $manager(new FooMessage('6816aea8-404a-4598-b748-cfcaedbb886b'));
         $manager(new BarMessage());
         $identifiers = $this->store->findSagas(
-            Foo::class,
+            FooSaga::class,
             new AssociationValue('str', 'bar'),
         );
 
         $this->assertNotEmpty($identifiers);
         $entry = $this->repository->loadSaga($identifiers[0]);
-        $this->assertInstanceOf(Foo::class, $entry->instance);
-        \assert($entry->instance instanceof Foo);
+        $this->assertInstanceOf(FooSaga::class, $entry->instance);
+        \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->barInvoked);
     }
 
@@ -131,14 +134,14 @@ class SagaManagerTest extends TestCase
         $manager(new FooMessage($id));
         $manager(new BazMessage($id));
         $identifiers = $this->store->findSagas(
-            Foo::class,
+            FooSaga::class,
             new AssociationValue('id', $id),
         );
 
         $this->assertNotEmpty($identifiers);
         $entry = $this->repository->loadSaga($identifiers[0]);
-        $this->assertInstanceOf(Foo::class, $entry->instance);
-        \assert($entry->instance instanceof Foo);
+        $this->assertInstanceOf(FooSaga::class, $entry->instance);
+        \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->bazInvoked);
         $this->assertEquals(SagaState::Completed, $entry->getState());
     }
@@ -151,14 +154,14 @@ class SagaManagerTest extends TestCase
         $this->expectException(SagaRejected::class);
         $manager(new BarMessage(exception: new RuntimeException('Intentional failure')));
         $identifiers = $this->store->findSagas(
-            Foo::class,
+            FooSaga::class,
             new AssociationValue('id', $id),
         );
 
         $this->assertNotEmpty($identifiers);
         $entry = $this->repository->loadSaga($identifiers[0]);
-        $this->assertInstanceOf(Foo::class, $entry->instance);
-        \assert($entry->instance instanceof Foo);
+        $this->assertInstanceOf(FooSaga::class, $entry->instance);
+        \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->bazInvoked);
         $this->assertEquals(SagaState::Rejected, $entry->getState());
     }
@@ -171,14 +174,14 @@ class SagaManagerTest extends TestCase
         $this->expectException(SagaRejected::class);
         $manager(new BazMessage($id, new RuntimeException('Intentional failure')));
         $identifiers = $this->store->findSagas(
-            Foo::class,
+            FooSaga::class,
             new AssociationValue('id', $id),
         );
 
         $this->assertNotEmpty($identifiers);
         $entry = $this->repository->loadSaga($identifiers[0]);
-        $this->assertInstanceOf(Foo::class, $entry->instance);
-        \assert($entry->instance instanceof Foo);
+        $this->assertInstanceOf(FooSaga::class, $entry->instance);
+        \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->bazInvoked);
         $this->assertEquals(SagaState::Rejected, $entry->getState());
     }

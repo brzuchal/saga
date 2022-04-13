@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brzuchal\Saga\Tests\Mapping;
 
 use Brzuchal\Saga\Association\AssociationResolver;
@@ -8,9 +10,9 @@ use Brzuchal\Saga\Association\PropertyNameEvaluator;
 use Brzuchal\Saga\Factory\ReflectionClassFactory;
 use Brzuchal\Saga\Mapping\SagaMetadata;
 use Brzuchal\Saga\Mapping\SagaMethodMetadata;
-use Brzuchal\Saga\Tests\Fixtures\Foo;
 use Brzuchal\Saga\Tests\Fixtures\FooBarMessage;
 use Brzuchal\Saga\Tests\Fixtures\FooMessage;
+use Brzuchal\Saga\Tests\Fixtures\FooSaga;
 use PHPUnit\Framework\TestCase;
 
 class SagaMetadataTest extends TestCase
@@ -23,8 +25,8 @@ class SagaMetadataTest extends TestCase
             new AssociationResolver('fooId', new PropertyNameEvaluator('id')),
         );
         $metadata = new SagaMetadata(
-            Foo::class,
-            \Closure::fromCallable(new ReflectionClassFactory(Foo::class)),
+            FooSaga::class,
+            \Closure::fromCallable(new ReflectionClassFactory(FooSaga::class)),
             [$methodMetadata],
         );
         $message = new FooMessage();
@@ -46,8 +48,8 @@ class SagaMetadataTest extends TestCase
             new AssociationResolver('fooId', new MethodNameEvaluator('getId')),
         );
         $metadata = new SagaMetadata(
-            Foo::class,
-            \Closure::fromCallable(new ReflectionClassFactory(Foo::class)),
+            FooSaga::class,
+            \Closure::fromCallable(new ReflectionClassFactory(FooSaga::class)),
             [$foo, $fooBar],
         );
         $message = new FooMessage();

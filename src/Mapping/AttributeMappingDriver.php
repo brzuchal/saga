@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Mapping;
 
@@ -17,12 +19,15 @@ use UnexpectedValueException;
 
 final class AttributeMappingDriver implements MappingDriver
 {
-    private const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^ CoreReflectionMethod::IS_ABSTRACT ^ CoreReflectionMethod::IS_STATIC;
+    private const METHODS_FILTER = CoreReflectionMethod::IS_PUBLIC ^
+        CoreReflectionMethod::IS_ABSTRACT ^
+        CoreReflectionMethod::IS_STATIC;
 
     /**
-     * @inheritdoc
      * @throws ReflectionException
      * @throws IncompleteSagaMetadata
+     *
+     * @inheritdoc
      */
     public function loadMetadataForClass(string $class): SagaMetadata|null
     {
@@ -43,6 +48,7 @@ final class AttributeMappingDriver implements MappingDriver
 
     /**
      * @psalm-return list<SagaMethodMetadata>
+     *
      * @throws IncompleteSagaMetadata
      */
     public function extractMethods(ReflectionClass $class): array
@@ -53,12 +59,14 @@ final class AttributeMappingDriver implements MappingDriver
             if ($eventHandlerAttribute === null) {
                 continue;
             }
+
             if ($method->getNumberOfRequiredParameters() < 1) {
                 throw IncompleteSagaMetadata::cannotDetermineMessageType(
                     $class->getName(),
                     $method->getName(),
                 );
             }
+
             $parameterTypes = $this->extractMethodParameterTypes($method);
             $creationPolicy = $this->extractCreationPolicy($method);
 
@@ -115,40 +123,49 @@ final class AttributeMappingDriver implements MappingDriver
     private function extractMethodParameterTypes(ReflectionMethod $method): array
     {
         $parameter = $method->getParameters()[0];
-        if (!$parameter->hasType()) {
+        if (! $parameter->hasType()) {
             throw new UnexpectedValueException('Saga methods require typed first argument');
         }
+
         if ($parameter->allowsNull()) {
             throw new UnexpectedValueException('Saga methods require non-nullable first argument');
         }
+
         if ($parameter->isDefaultValueAvailable()) {
             throw new UnexpectedValueException('Saga method first argument default value is forbidden');
         }
+
         $parameterType = $parameter->getType();
         if ($parameterType === null) {
             throw new UnexpectedValueException('Saga method first argument type is required');
         }
+
         if ($parameterType instanceof ReflectionIntersectionType) {
             throw new UnexpectedValueException('Saga method first argument type cannot be intersection type');
         }
+
         if ($parameterType instanceof ReflectionNamedType) {
             if ($parameterType->isBuiltin()) {
                 throw new UnexpectedValueException('Saga method first argument type cannot be built-in');
             }
+
             $type = $parameterType->getName();
             \assert(\class_exists($type));
 
             return [$type];
         }
+
         $types = [];
         if ($parameterType->getTypes()) {
             foreach ($parameterType->getTypes() as $type) {
                 if ($type->isBuiltin()) {
                     throw new UnexpectedValueException('Saga method first argument type cannot include built-in types');
                 }
+
                 if ($type->allowsNull()) {
                     throw new UnexpectedValueException('Saga methods first argument type cannot include null type');
                 }
+
                 $type = $type->getName();
                 \assert(\class_exists($type));
                 $types[] = $type;
@@ -175,10 +192,7 @@ final class AttributeMappingDriver implements MappingDriver
     protected function hasEndAttribute(ReflectionMethod $method): bool
     {
         $attributes = $method->getAttributesByInstance(SagaStart::class);
-        if (empty($attributes)) {
-            return false;
-        }
 
-        return true;
+        return ! empty($attributes);
     }
 }

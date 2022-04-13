@@ -1,17 +1,12 @@
 <?xml version="1.0"?>
-<psalm
-    totallyTyped="false"
-    resolveFromConfigFile="true"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<psalm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
         <directory name="src" />
-        <directory name="symfony-bundle" />
         <ignoreFiles>
             <directory name="src/Tests" />
-            <directory name="symfony-bundle/Tests" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

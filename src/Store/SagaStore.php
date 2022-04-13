@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Brzuchal\Saga\Store;
 
@@ -14,13 +16,15 @@ interface SagaStore
 {
     /**
      * @psalm-param class-string $type
+     *
      * @return list<string>
      */
     public function findSagas(string $type, AssociationValue $associationValue): iterable;
 
     /**
      * @psalm-param class-string $type
-     * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store
+     *
+     * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store.
      */
     public function loadSaga(string $type, string $identifier): SagaStoreEntry;
 
@@ -32,10 +36,21 @@ interface SagaStore
     /**
      * @psalm-param class-string $type
      */
-    public function insertSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues): void;
+    public function insertSaga(
+        string $type,
+        string $identifier,
+        object $saga,
+        AssociationValues $associationValues,
+    ): void;
 
     /**
      * @psalm-param class-string $type
      */
-    public function updateSaga(string $type, string $identifier, object $saga, AssociationValues $associationValues, SagaState $state): void;
+    public function updateSaga(
+        string $type,
+        string $identifier,
+        object $saga,
+        AssociationValues $associationValues,
+        SagaState $state,
+    ): void;
 }
