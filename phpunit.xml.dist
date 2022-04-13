@@ -5,15 +5,11 @@
     <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">src</directory>
-            <directory suffix=".php">symfony/bundle</directory>
         </include>
     </coverage>
     <testsuites>
-        <testsuite name="Saga">
+        <testsuite name="tests">
             <directory>src/Tests</directory>
-        </testsuite>
-        <testsuite name="SagaBundle">
-            <directory>symfony-bundle/Tests</directory>
         </testsuite>
     </testsuites>
     <php>
