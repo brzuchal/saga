@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Brzuchal\Saga\Mapping;
 
+use function sprintf;
+
 final class SagaMetadataFactory
 {
     /** @psalm-var array<class-string, SagaMetadata> */
@@ -17,6 +19,8 @@ final class SagaMetadataFactory
 
     /**
      * @param class-string $type
+     *
+     * @throws IncompleteSagaMetadata
      */
     public function create(string $type): SagaMetadata
     {
@@ -33,7 +37,10 @@ final class SagaMetadataFactory
             return $this->data[$type] = $metadata;
         }
 
-        return $this->data[$type];
+        throw new IncompleteSagaMetadata(sprintf(
+            'Saga metadata not found while looking for "%s"',
+            $type,
+        ));
     }
 
     /**
