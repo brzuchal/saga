@@ -217,16 +217,16 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     protected function addDataTableSchema(Schema $schema): void
     {
         $table = $schema->createTable($this->dataTableName);
-        $table->addColumn('id', Types::STRING)
+        $table->addColumn('id', Types::STRING, ['length' => 36])
             ->setNotnull(true);
-        $table->addColumn('type', Types::STRING)
+        $table->addColumn('type', Types::STRING, ['length' => 128])
             ->setNotnull(true);
         $table->addColumn('serialized', Types::TEXT)
             ->setNotnull(true);
         $table->addColumn('state', Types::SMALLINT)
             ->setNotnull(true);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['type']);
+        $table->setPrimaryKey(['id', 'type']);
+        $table->addIndex(['type'], options: ['lengths' => [64]]);
     }
 
     /**
@@ -235,21 +235,19 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
     protected function addAssocTableSchema(Schema $schema): void
     {
         $table = $schema->createTable($this->assocTableName);
-        $table->addColumn('saga_id', Types::STRING)
+        $table->addColumn('saga_id', Types::STRING, ['length' => 36])
             ->setNotnull(true);
-        $table->addColumn('saga_type', Types::STRING)
+        $table->addColumn('saga_type', Types::STRING, ['length' => 128])
             ->setNotnull(true);
-        $table->addColumn('association_key', Types::STRING)
+        $table->addColumn('association_key', Types::STRING, ['length' => 64])
             ->setNotnull(true);
         $table->addColumn('association_value', Types::STRING)
             ->setNotnull(true);
-        $table->setPrimaryKey(['saga_id', 'association_key']);
-        $table->addIndex(['saga_type', 'association_key', 'association_value']);
+        $table->addIndex(['saga_type', 'association_key'], options: ['lengths' => [32, 32]]);
         $table->addForeignKeyConstraint(
-            $this->dataTableName,
+            $schema->getTable($this->dataTableName),
             ['saga_id', 'saga_type'],
             ['id', 'type'],
-            ['onDelete' => 'CASCADE'],
         );
     }
 }

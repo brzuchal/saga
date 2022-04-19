@@ -75,9 +75,6 @@ final class SimpleSagaRepository implements SagaRepository
         );
     }
 
-    /**
-     * @throws IdentifierGenerationFailed
-     */
     public function createNewSaga(object $message, AssociationValue $associationValue): SagaInstance|null
     {
         $instance = new SagaInstance(
