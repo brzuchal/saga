@@ -39,13 +39,13 @@ class SagaManagerTest extends TestCase
         $this->store = new InMemorySagaStore();
         $repositoryFactory = new SimpleSagaRepositoryFactory(
             $this->store,
+            static fn () => new FooSaga(),
             new SagaMetadataFactory([
                 new class () implements MappingDriver {
                     public function loadMetadataForClass(string $class): SagaMetadata|null
                     {
                         return new SagaMetadata(
                             FooSaga::class,
-                            static fn () => new FooSaga(),
                             [
                                 new SagaMethodMetadata(
                                     'foo',
@@ -171,7 +171,7 @@ class SagaManagerTest extends TestCase
         $manager = new SagaManager($this->repository);
         $id = 'b4d353d9-a30a-4a63-861f-034b078f0904';
         $manager(new FooMessage($id));
-        $this->expectException(SagaRejected::class);
+        $this->expectException(RuntimeException::class);
         $manager(new BazMessage($id, new RuntimeException('Intentional failure')));
         $identifiers = $this->store->findSagas(
             FooSaga::class,
@@ -183,6 +183,6 @@ class SagaManagerTest extends TestCase
         $this->assertInstanceOf(FooSaga::class, $entry->instance);
         \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->bazInvoked);
-        $this->assertEquals(SagaState::Rejected, $entry->getState());
+        $this->assertEquals(SagaState::Pending, $entry->getState());
     }
 }

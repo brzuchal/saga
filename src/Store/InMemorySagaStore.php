@@ -33,7 +33,7 @@ final class InMemorySagaStore implements SagaStore
         return $found;
     }
 
-    public function loadSaga(string $type, string $identifier): SagaStoreEntry
+    public function loadSaga(string $type, string $identifier, object|null $object = null): SagaStoreEntry
     {
         if (! \array_key_exists($type, $this->instances)) {
             throw SagaInstanceNotFound::unableToLoad($type, $identifier);

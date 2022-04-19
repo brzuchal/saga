@@ -16,14 +16,8 @@ final class SagaMetadata
      */
     public function __construct(
         public readonly string $type,
-        protected readonly Closure $factory,
         protected array $methods,
     ) {
-    }
-
-    public function newInstance(): object
-    {
-        return ($this->factory)();
     }
 
     /**

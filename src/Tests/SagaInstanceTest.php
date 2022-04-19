@@ -27,7 +27,7 @@ class SagaInstanceTest extends TestCase
             $identifier,
             $saga,
             new AssociationValues([$associationValue]),
-            new SagaMetadata(FooSaga::class, static fn () => new FooSaga(), []),
+            new SagaMetadata(FooSaga::class, []),
         );
         $this->assertEquals($identifier, $instance->id);
         $this->assertSame($saga, $instance->instance);
@@ -46,7 +46,7 @@ class SagaInstanceTest extends TestCase
             'd9892261-1844-4a11-8e83-daacdee0c00e',
             $saga,
             new AssociationValues([$associationValue]),
-            new SagaMetadata(FooSaga::class, static fn () => new FooSaga(), [
+            new SagaMetadata(FooSaga::class, [
                 new SagaMethodMetadata('foo', [FooMessage::class], $associationResolver),
             ]),
         );
@@ -62,7 +62,7 @@ class SagaInstanceTest extends TestCase
             'd9892261-1844-4a11-8e83-daacdee0c00e',
             $saga,
             new AssociationValues([$associationValue]),
-            new SagaMetadata(FooSaga::class, static fn () => new FooSaga(), [
+            new SagaMetadata(FooSaga::class, [
                 new SagaMethodMetadata('foo', [FooMessage::class], $associationResolver),
             ]),
         );

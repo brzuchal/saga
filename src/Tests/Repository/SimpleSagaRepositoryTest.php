@@ -26,7 +26,7 @@ class SimpleSagaRepositoryTest extends TestCase
     protected function setUp(): void
     {
         $associationResolver = new AssociationResolver('id', new PropertyNameEvaluator('id'));
-        $this->metadata = new SagaMetadata(FooSaga::class, static fn () => new FooSaga(), [
+        $this->metadata = new SagaMetadata(FooSaga::class, [
             new SagaMethodMetadata('foo', [FooMessage::class], $associationResolver),
         ]);
     }
@@ -34,14 +34,14 @@ class SimpleSagaRepositoryTest extends TestCase
     public function testCreate(): void
     {
         $store = $this->createMock(SagaStore::class);
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $this->assertEquals(FooSaga::class, $repository->getType());
     }
 
     public function testSupports(): void
     {
         $store = $this->createMock(SagaStore::class);
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $this->assertTrue($repository->supports(new FooMessage()));
     }
 
@@ -57,7 +57,7 @@ class SimpleSagaRepositoryTest extends TestCase
                 $this->isInstanceOf(AssociationValue::class),
             )
             ->willReturn([$identifier]);
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $this->assertEquals([$identifier], $repository->findSagas($message));
     }
 
@@ -69,7 +69,7 @@ class SimpleSagaRepositoryTest extends TestCase
             ->method('loadSaga')
             ->with($this->equalTo(FooSaga::class), $this->equalTo($identifier))
             ->willReturn(new SimpleSagaStoreEntry(new FooSaga(), new AssociationValues([])));
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $instance = $repository->loadSaga($identifier);
         $this->assertEquals(FooSaga::class, $instance->getType());
         $this->assertInstanceOf(FooSaga::class, $instance->instance);
@@ -90,7 +90,7 @@ class SimpleSagaRepositoryTest extends TestCase
                 $this->isInstanceOf(FooSaga::class),
                 $this->isInstanceOf(AssociationValues::class),
             );
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $instance = $repository->createNewSaga(new FooMessage($identifier), new AssociationValue('id', $identifier));
         $this->assertEquals(FooSaga::class, $instance->getType());
         $this->assertInstanceOf(FooSaga::class, $instance->instance);
@@ -106,7 +106,7 @@ class SimpleSagaRepositoryTest extends TestCase
         $store->expects($this->once())
             ->method('deleteSaga')
             ->with($this->equalTo(FooSaga::class), $this->equalTo($identifier));
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $repository->deleteSaga($identifier);
     }
 
@@ -122,7 +122,7 @@ class SimpleSagaRepositoryTest extends TestCase
                 $this->isInstanceOf(FooSaga::class),
                 $this->isInstanceOf(AssociationValues::class),
             );
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $repository->storeSaga(new SagaInstance(
             $identifier,
             new FooSaga(),
@@ -134,7 +134,7 @@ class SimpleSagaRepositoryTest extends TestCase
     public function testInitializationPolicy(): void
     {
         $store = $this->createMock(SagaStore::class);
-        $repository = new SimpleSagaRepository($store, $this->metadata);
+        $repository = new SimpleSagaRepository($store, static fn () => new FooSaga(), $this->metadata);
         $id = 'dd906272-e323-4ab5-8904-95b8a53d19e7';
         $policy = $repository->initializationPolicy(new FooMessage($id));
         $this->assertFalse($policy->createAlways());

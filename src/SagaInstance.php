@@ -65,8 +65,6 @@ final class SagaInstance
             }
         } catch (SagaRejected $exception) {
             throw $exception;
-        } catch (\Throwable $exception) {
-            $lifecycle->reject($exception);
         } finally {
             $this->state = $lifecycle->getState();
         }

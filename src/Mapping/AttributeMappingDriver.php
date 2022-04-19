@@ -37,11 +37,8 @@ final class AttributeMappingDriver implements MappingDriver
             return null;
         }
 
-        $factory = new ReflectionClassFactory($reflection->getName());
-
         return new SagaMetadata(
             $class,
-            $factory(...),
             $this->extractMethods($reflection),
         );
     }
@@ -191,7 +188,7 @@ final class AttributeMappingDriver implements MappingDriver
 
     protected function hasEndAttribute(ReflectionMethod $method): bool
     {
-        $attributes = $method->getAttributesByInstance(SagaStart::class);
+        $attributes = $method->getAttributesByInstance(SagaEnd::class);
 
         return ! empty($attributes);
     }

@@ -12,7 +12,8 @@
   "require": {
     "php": "8.1.*",
     "roave/better-reflection": "^5.0@dev",
-    "doctrine/dbal": "^3.3"
+    "doctrine/dbal": "^3.3",
+    "symfony/serializer": "^6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.1",
@@ -32,5 +33,10 @@
   "suggest": {
     "symfony/property-access": "Allows to evaluate association values from a message object or embeded array using a simple string notation",
     "symfony/expression-language": "Allows to evaluate association values from a message using a notation allowing to compile and evaluate expressions"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

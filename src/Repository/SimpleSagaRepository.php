@@ -14,11 +14,14 @@ use Brzuchal\Saga\SagaInitializationPolicy;
 use Brzuchal\Saga\SagaInstance;
 use Brzuchal\Saga\SagaRepository;
 use Brzuchal\Saga\Store\SagaStore;
+use Brzuchal\Saga\Store\SetupableSagaStore;
+use Closure;
 
 final class SimpleSagaRepository implements SagaRepository
 {
     public function __construct(
         protected SagaStore $store,
+        protected Closure $factory,
         protected SagaMetadata $metadata,
         protected SagaIdentifierGenerator $identifierGenerator = new SagaIdentifierGenerator(),
     ) {
@@ -41,6 +44,10 @@ final class SimpleSagaRepository implements SagaRepository
      */
     public function findSagas(object $message): iterable
     {
+        if ($this->store instanceof SetupableSagaStore) {
+            $this->store->setup();
+        }
+
         return $this->store->findSagas(
             $this->metadata->type,
             $this->metadata->resolveAssociation($message),
@@ -49,9 +56,14 @@ final class SimpleSagaRepository implements SagaRepository
 
     public function loadSaga(string $identifier): SagaInstance
     {
+        if ($this->store instanceof SetupableSagaStore) {
+            $this->store->setup();
+        }
+
         $entry = $this->store->loadSaga(
             $this->metadata->type,
             $identifier,
+            $this->createSaga(),
         );
 
         return new SagaInstance(
@@ -70,10 +82,14 @@ final class SimpleSagaRepository implements SagaRepository
     {
         $instance = new SagaInstance(
             $this->identifierGenerator->generateIdentifier(),
-            $this->metadata->newInstance(),
+            $this->createSaga(),
             new AssociationValues([$associationValue]),
             $this->metadata,
         );
+        if ($this->store instanceof SetupableSagaStore) {
+            $this->store->setup();
+        }
+
         $this->store->insertSaga(
             $instance->getType(),
             $instance->id,
@@ -86,11 +102,19 @@ final class SimpleSagaRepository implements SagaRepository
 
     public function deleteSaga(string $identifier): void
     {
+        if ($this->store instanceof SetupableSagaStore) {
+            $this->store->setup();
+        }
+
         $this->store->deleteSaga($this->metadata->type, $identifier);
     }
 
     public function storeSaga(SagaInstance $instance): void
     {
+        if ($this->store instanceof SetupableSagaStore) {
+            $this->store->setup();
+        }
+
         $this->store->updateSaga(
             $instance->getType(),
             $instance->id,
@@ -109,5 +133,10 @@ final class SimpleSagaRepository implements SagaRepository
             $this->metadata->creationPolicy($message),
             $this->metadata->resolveAssociation($message),
         );
+    }
+
+    protected function createSaga(): object
+    {
+        return ($this->factory)();
     }
 }

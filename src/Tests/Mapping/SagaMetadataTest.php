@@ -26,7 +26,6 @@ class SagaMetadataTest extends TestCase
         );
         $metadata = new SagaMetadata(
             FooSaga::class,
-            \Closure::fromCallable(new ReflectionClassFactory(FooSaga::class)),
             [$methodMetadata],
         );
         $message = new FooMessage();
@@ -49,7 +48,6 @@ class SagaMetadataTest extends TestCase
         );
         $metadata = new SagaMetadata(
             FooSaga::class,
-            \Closure::fromCallable(new ReflectionClassFactory(FooSaga::class)),
             [$foo, $fooBar],
         );
         $message = new FooMessage();

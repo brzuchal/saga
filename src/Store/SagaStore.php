@@ -26,7 +26,7 @@ interface SagaStore
      *
      * @throws SagaInstanceNotFound if saga instance cannot be loaded from the store.
      */
-    public function loadSaga(string $type, string $identifier): SagaStoreEntry;
+    public function loadSaga(string $type, string $identifier, object|null $object = null): SagaStoreEntry;
 
     /**
      * @psalm-param class-string $type

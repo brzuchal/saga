@@ -30,7 +30,7 @@ final class ReflectionClassFactory
      *
      * @throws ReflectionException
      */
-    public function __invoke(): callable
+    public function __invoke(): object
     {
         $instance = $this->reflectionClass->newInstanceWithoutConstructor();
         \assert($instance instanceof $this->type);
