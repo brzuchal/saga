@@ -13,12 +13,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Types;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use function sprintf;
@@ -30,17 +25,9 @@ final class DoctrineSagaStore implements SagaStore, SetupableSagaStore
 
     public function __construct(
         protected Connection $connection,
+        protected SerializerInterface $serializer,
         protected string $assocTableName = self::DEFAULT_ASSOC_TABLE_NAME,
         protected string $dataTableName = self::DEFAULT_DATA_TABLE_NAME,
-        protected SerializerInterface $serializer = new Serializer([
-            new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d H:i:s']),
-            new ObjectNormalizer(
-                propertyTypeExtractor: new ReflectionExtractor(),
-                nameConverter: new CamelCaseToSnakeCaseNameConverter(),
-            ),
-        ], [
-            new JsonEncoder(),
-        ]),
     ) {
     }
 
