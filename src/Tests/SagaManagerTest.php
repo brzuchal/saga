@@ -14,7 +14,6 @@ use Brzuchal\Saga\Mapping\SagaMethodMetadata;
 use Brzuchal\Saga\Repository\SimpleSagaRepositoryFactory;
 use Brzuchal\Saga\SagaCreationPolicy;
 use Brzuchal\Saga\SagaIdentifierGenerator;
-use Brzuchal\Saga\SagaInstanceNotFound;
 use Brzuchal\Saga\SagaManager;
 use Brzuchal\Saga\SagaRejected;
 use Brzuchal\Saga\SagaRepository;
@@ -118,13 +117,6 @@ class SagaManagerTest extends TestCase
         $this->assertInstanceOf(FooSaga::class, $entry->instance);
         \assert($entry->instance instanceof FooSaga);
         $this->assertTrue($entry->instance->barInvoked);
-    }
-
-    public function testFailOnMissingInstance(): void
-    {
-        $manager = new SagaManager($this->repository);
-        $this->expectException(SagaInstanceNotFound::class);
-        $manager(new BarMessage());
     }
 
     public function testEndInvokeAndSagaCompletion(): void

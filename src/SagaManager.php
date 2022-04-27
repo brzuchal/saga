@@ -37,14 +37,11 @@ final class SagaManager
         }
 
         $initializationPolicy = $this->repository->initializationPolicy($message);
-        if ($this->shouldCreateNewSaga($nonInvokedSaga, $initializationPolicy)) {
-            $this->startNewSaga($message, $initializationPolicy->initialAssociationValue());
-        } elseif ($nonInvokedSaga) {
-            throw SagaInstanceNotFound::unableToFind(
-                $this->repository->getType(),
-                $initializationPolicy->initialAssociationValue(),
-            );
+        if (! $this->shouldCreateNewSaga($nonInvokedSaga, $initializationPolicy)) {
+             return;
         }
+
+        $this->startNewSaga($message, $initializationPolicy->initialAssociationValue());
     }
 
     /**
