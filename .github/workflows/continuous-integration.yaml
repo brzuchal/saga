@@ -1,47 +1,77 @@
 name: Continuous Integration
 
 on:
-  pull_request:
   push:
-    branches:
-      - "[0-9]+.x"
+    branches: [ 1.x ]
+  pull_request:
+    branches: [ 1.x ]
 
 jobs:
-  test:
+  analysis:
+    name: Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+    steps:
+      -   uses: actions/checkout@v3
+      -   uses: shivammathur/setup-php@v2
+          with:
+            php-version: "8.1"
+          env: { runner: self-hosted }
+      -   uses: ramsey/composer-install@v2
+          env: { runner: self-hosted }
+
+      -   run: mkdir -p report/psalm
+          if: success() || failure()
+      -   run: composer exec -- psalm --long-progress --output-format=github --report=report/psalm/checkstyle.xml --report-show-info=false
+          if: success() || failure()
+      -   uses: jwgmeligmeyling/checkstyle-github-action@master
+          if: success() || failure()
+          with:
+            name: Psalm
+            path: report/psalm/checkstyle.xml
+
+      -   run: mkdir -p report/phpcs
+          if: success() || failure()
+      -   run: composer exec -- phpcs --colors --report=checkstyle --report-checkstyle=report/phpcs/checkstyle.xml
+          if: success() || failure()
+      -   uses: jwgmeligmeyling/checkstyle-github-action@master
+          if: success() || failure()
+          with:
+            name: PHP_CodeSniffer
+            path: report/phpcs/checkstyle.xml
+
+  tests:
     name: Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dependency-versions:
-          - lowest
-          - highest
-          - locked
+        php: [ "8.1" ]
+        dependency-versions: [ lowest, highest ]
+        include:
+          - php: "8.2"
+            dependency-versions: lowest
+            composer-options: "--ignore-platform-reqs"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
-      - uses: ramsey/composer-install@v1
+          php-version: "${{ matrix.php }}"
+        env: { runner: self-hosted }
+      - uses: ramsey/composer-install@v2
         with:
           dependency-versions: "${{ matrix.dependency-versions }}"
-      - name: PHPUnit
-        run: vendor/bin/phpunit
-  analysis:
-    name: Analysis
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dependency-versions:
-          - lowest
-          - highest
-          - locked
-    steps:
-      - uses: actions/checkout@v2
-      - uses: shivammathur/setup-php@v2
+          composer-options: "${{ matrix.composer-options }}"
+        env: { runner: self-hosted }
+      - run: mkdir -p report/phpunit
+        if: success() || failure()
+      - run: composer exec -- phpunit --testsuite tests --colors=always  --log-junit=report/phpunit/junit-${{ matrix.php }}-${{ matrix.dependency-versions }}.xml
+        if: success() || failure()
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: success() || failure()
         with:
-          php-version: "8.1"
-      - uses: ramsey/composer-install@v1
-        with:
-          dependency-versions: "${{ matrix.dependency-versions }}"
-      - name: Psalm
-        run: vendor/bin/psalm
+          check_name: "PHPUnit (${{ matrix.php }} with ${{ matrix.dependency-versions }} dependencies)"
+          junit_files: "report/phpunit/**/*.xml"
